@@ -12,8 +12,8 @@ namespace algorithms {
     };
 
     namespace {
-        using std::vector;
-
+        typedef std::vector<std::map<char, std::set<int>>> table;
+        using std::vector, std::map, std::set;
 
         vector<transition> kleene (const vector<transition> &deltas)
         {
@@ -56,6 +56,7 @@ namespace algorithms {
 
             return result;
         }
+
         vector<transition> unite 
         (const vector<transition> &deltas1, const vector<transition> &deltas2)
         {
@@ -81,13 +82,33 @@ namespace algorithms {
 
             result.insert(result.end(), new_trasitions.begin(), new_trasitions.end());
         }
+
+        vector<std::map<char, std::set<int>>> make_table(vector<transition> t_vector)
+        {
+            int states = 0;
+            for (auto &t: t_vector) 
+                states = std::max(states, t.origin, t.destiny);
+            
+            table transition_table (states + 1);
+            for (auto &t: t_vector) {
+                map<char, set<int>> *t_map = &transition_table.at(t.origin);
+                if (!t_map->contains(t.symbol)) {
+                    t_map->insert({t.symbol, {t.destiny}});
+                    continue;
+                }
+
+                set<int> *dest_set = &t_map->at(t.symbol);
+                dest_set->insert(t.destiny);
+            }
+
+            return transition_table;
+        }
     }
 
     std::vector<std::map<char, std::set<int>>>
     algorithms::thompson (std::string expression)
     {
-        using std::vector, std::map, std::set;
-        typedef std::vector<std::map<char, std::set<int>>> table;
+        using std::vector;
 
         std::stack<vector<transition>> transitions {};
         for (auto &c: expression)
@@ -122,26 +143,7 @@ namespace algorithms {
             }
         }
 
-        //build the transition table
-        vector<transition> t_vector = transitions.top();
-
-        int states = 0;
-        for (auto &t: t_vector) 
-            states = std::max(states, t.origin, t.destiny);
-        
-        table transition_table (states + 1);
-        for (auto &t: t_vector) {
-            map<char, set<int>> *t_map = &transition_table.at(t.origin);
-            if (!t_map->contains(t.symbol)) {
-                t_map->insert({t.symbol, {t.destiny}});
-                continue;
-            }
-
-            set<int> *dest_set = &t_map->at(t.symbol);
-            dest_set->insert(t.destiny);
-        }
-
-        return transition_table;
+        return make_table(transitions.top());
     }
   
 }
