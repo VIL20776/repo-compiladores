@@ -1,20 +1,21 @@
 #include "automaton.hpp"
-#include "constructors.hpp"
+#include "thompson.hpp"
 
+#include <stack>
 
 namespace models {
+
 
 Automaton::Automaton(std::string postfix, FA_type type)
 {   
 
     if (type == NFA) {
         auto [
-            size,
             acceptance, 
             symbols, 
             transition_table
         ] = algorithms::thompson(postfix);
-        this->size = size;
+        this->size = transition_table.size();
         this->acceptance = acceptance;
         this->symbols = symbols;
         this->transition_table = transition_table;
@@ -42,6 +43,8 @@ bool Automaton::check(std::string word)
     
     return true;
 }
+
+
 
 void Automaton::graph_automaton(char* name)
 {

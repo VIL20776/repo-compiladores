@@ -1,4 +1,4 @@
-#include "constructors.hpp"
+#include "thompson.hpp"
 
 #include <algorithm>
 #include <stack>
@@ -112,7 +112,7 @@ namespace algorithms {
                 dest_set->insert(t.destiny);
             }
 
-            return {(states + 1), { states }, symbols, transition_table};
+            return {{ states }, symbols, transition_table};
         }
     }
 

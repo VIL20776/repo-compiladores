@@ -1,5 +1,7 @@
 #pragma once
 
+#include "props.hpp"
+
 #include <graphviz/cgraph.h>
 #include <graphviz/gvc.h>
 
@@ -13,6 +15,8 @@ namespace models
 {
     enum FA_type {DFA, NFA};
 
+    using algorithms::automaton_props;
+
     class Automaton
     {
     
@@ -24,22 +28,17 @@ namespace models
         transition_table;
 
     public:
-
         Automaton(std::string postfix, FA_type type);
-        Automaton(
-            std::vector<std::map<char, std::set<int>>>
-            transition_table, FA_type type
-        );
+        Automaton(automaton_props props, FA_type type);
         // ~Automaton();
 
         bool check(std::string input);
 
-        const std::set<int> &get_acceptance();
-        const std::set<int> &get_symbols();
-        const int &get_size();
+        const automaton_props &get_properties();
 
-        std::set<int> e_closure(int i);
-        std::set<int> e_closure(std::set<int> i);
+        std::set<int> e_closure(const int s);
+        std::set<int> e_closure(std::set<int> states);
+        std::set<int> move(std::set<int> states, char c);
 
         void graph_automaton(char *name);
     };
