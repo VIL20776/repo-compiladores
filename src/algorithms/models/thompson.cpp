@@ -1,4 +1,4 @@
-#include "thompson.hpp"
+#include "constructors.hpp"
 
 #include <algorithm>
 #include <stack>
@@ -22,7 +22,7 @@ namespace algorithms {
             int max_state = 0; 
             for (auto &t : deltas) {
                 result.push_back({t.origin + 1, t.destiny+ 1, t.symbol});
-                max_state = std::max({max_state, t.origin, t.destiny});
+                max_state = std::max({max_state, t.origin + 1, t.destiny + 1});
             }
 
             vector<transition> new_trasitions = {
@@ -47,10 +47,7 @@ namespace algorithms {
             int max = 0;
             for (auto &t: deltas1)
                 max = std::max({max, t.origin, t.destiny});
-
-            result.push_back({max, max + 1, '$'});
-
-            max += 1;
+    
             for (auto &t: deltas2)
                 result.push_back({t.origin + max, t.destiny + max, t.symbol});
 
@@ -68,11 +65,12 @@ namespace algorithms {
                 temp_max = std::max({temp_max, t.origin + 1, t.destiny + 1});
             }
 
-            int max = temp_max + 1;
+            int offset = temp_max + 1;
+            int max = offset;
             result.push_back({0, max, '$'});
             for (auto &t : deltas2) {
-                result.push_back({t.origin + temp_max, t.destiny + temp_max, t.symbol});
-                max = std::max({max, t.origin + temp_max, t.destiny});
+                result.push_back({t.origin + offset, t.destiny + offset, t.symbol});
+                max = std::max({max, (t.origin + offset), (t.destiny + offset)});
             }
 
             vector<transition> new_trasitions {
@@ -81,18 +79,31 @@ namespace algorithms {
             };
 
             result.insert(result.end(), new_trasitions.begin(), new_trasitions.end());
+            return result;
         }
 
-        vector<std::map<char, std::set<int>>> make_table(vector<transition> t_vector)
+        automaton_props make_table(vector<transition> t_vector)
         {
             int states = 0;
-            for (auto &t: t_vector) 
-                states = std::max(states, t.origin, t.destiny);
+            set<char> symbols {};
+            for (auto &t: t_vector) {
+                states = std::max({states, t.origin, t.destiny});
+                symbols.insert(t.symbol);
+            }
             
-            table transition_table (states + 1);
+            //Transition table initialization
+            table transition_table {};
+            for (size_t i = 0; i < (states + 1); i++) {
+                map<char,set<int>> init {};
+                for (auto &c: symbols) {
+                    init[c] = {};
+                }
+                transition_table.push_back(init);
+            }
+
             for (auto &t: t_vector) {
                 map<char, set<int>> *t_map = &transition_table.at(t.origin);
-                if (!t_map->contains(t.symbol)) {
+                if (t_map->find(t.symbol) == t_map->end()) {
                     t_map->insert({t.symbol, {t.destiny}});
                     continue;
                 }
@@ -101,12 +112,11 @@ namespace algorithms {
                 dest_set->insert(t.destiny);
             }
 
-            return transition_table;
+            return {(states + 1), { states }, symbols, transition_table};
         }
     }
 
-    std::vector<std::map<char, std::set<int>>>
-    algorithms::thompson (std::string expression)
+    automaton_props thompson (std::string expression)
     {
         using std::vector;
 
