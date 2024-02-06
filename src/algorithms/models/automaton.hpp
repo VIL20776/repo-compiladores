@@ -1,7 +1,5 @@
 #pragma once
 
-#include "props.hpp"
-
 #include <graphviz/cgraph.h>
 #include <graphviz/gvc.h>
 

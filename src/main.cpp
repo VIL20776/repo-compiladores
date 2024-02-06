@@ -9,8 +9,8 @@ int main(int argc, char const *argv[])
     std::string postfix = algorithms::regex_to_postfix(regex);
     std::cout << postfix << "\n";
 
-    models::Automaton nfa (postfix, models::NFA);
-    std::string nfa_name = "Thompson.png";
-    nfa.graph_automaton(nfa_name.data());
+    // models::Automaton nfa (postfix, models::NFA);
+    // std::string nfa_name = "Thompson.png";
+    // nfa.graph_automaton(nfa_name.data());
     return 0;
 }
