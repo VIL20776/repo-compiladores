@@ -1,25 +1,22 @@
 #include "automaton.hpp"
-#include "thompson.hpp"
 
 #include <stack>
 
 namespace models {
 
 
-Automaton::Automaton(std::string postfix, FA_type type)
+Automaton::Automaton(
+    std::set<int> acceptance,
+    std::set<char> symbols,
+    std::vector<std::map<char, std::set<int>>> 
+    transition_table)
 {   
 
-    if (type == NFA) {
-        auto [
-            acceptance, 
-            symbols, 
-            transition_table
-        ] = algorithms::thompson(postfix);
-        this->size = transition_table.size();
-        this->acceptance = acceptance;
-        this->symbols = symbols;
-        this->transition_table = transition_table;
-    }
+    this->size = transition_table.size();
+    this->acceptance = acceptance;
+    this->symbols = symbols;
+    this->transition_table = transition_table;
+    
 }
 
 bool Automaton::check(std::string word)

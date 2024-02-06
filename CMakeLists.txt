@@ -16,7 +16,7 @@ find_library(gvc libgbc NAMES gvc)
 
 add_library(algorithms STATIC 
     src/algorithms/postfix.cpp 
-    src/algorithms/models/thompson.cpp
+    src/algorithms/thompson.cpp
     src/algorithms/models/automaton.cpp)
 target_include_directories(algorithms PRIVATE src/algorithms)
 
