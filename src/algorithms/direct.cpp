@@ -10,7 +10,7 @@ namespace algorithms {
     Direct::Direct(std::string expression): 
         tree(expression + "#.") {};
 
-    models::Automaton *Direct::create_automata ()
+    std::unique_ptr<models::Automaton> Direct::create_automata ()
     {
         typedef std::vector<std::map<char, std::set<int>>> table;
         using std::set, std::map, std::vector;
@@ -65,7 +65,7 @@ namespace algorithms {
         }
         
         
-        return new models::Automaton {new_acceptance, symbols, new_table};
+        return std::make_unique<models::Automaton>(new_acceptance, symbols, new_table);
     }
 
 }

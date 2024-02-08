@@ -13,6 +13,6 @@ namespace algorithms {
 
         public:
         Direct(std::string expression);
-        models::Automaton *create_automata (); 
+        std::unique_ptr<models::Automaton> create_automata (); 
     };
 }

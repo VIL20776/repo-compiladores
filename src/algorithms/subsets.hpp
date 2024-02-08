@@ -16,6 +16,6 @@ namespace algorithms {
 
         public:
         Subsets(models::Automaton *automaton);
-        models::Automaton *create_automata (); 
+        std::unique_ptr<models::Automaton> create_automata (); 
     };
 }

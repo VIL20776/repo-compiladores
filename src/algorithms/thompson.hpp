@@ -14,7 +14,7 @@ namespace algorithms {
         std::string expression;
     public:
         Thompson(const std::string &expression);
-        models::Automaton *create_automata();
+        std::unique_ptr<models::Automaton> create_automata();
     };
 
 }

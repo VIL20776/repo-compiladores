@@ -57,7 +57,7 @@ namespace algorithms {
         this->automaton = automaton;
     }
 
-    models::Automaton *Subsets::create_automata ()
+    std::unique_ptr<models::Automaton> Subsets::create_automata ()
     {
         typedef std::vector<std::map<char, std::set<int>>> table;
         using std::set, std::map, std::vector;
@@ -102,7 +102,7 @@ namespace algorithms {
             mark++;
         }
         
-        return new models::Automaton {new_acceptance, symbols, new_table};
+        return std::make_unique<models::Automaton>(new_acceptance, symbols, new_table);
     }
 
 }

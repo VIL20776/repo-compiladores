@@ -126,7 +126,7 @@ namespace algorithms {
         this->expression = expression;
     }
 
-    models::Automaton *Thompson::create_automata()
+    std::unique_ptr<models::Automaton> Thompson::create_automata()
     { 
         using std::vector;
         vector<transition> t_vector = list_transitions(expression);
@@ -159,7 +159,7 @@ namespace algorithms {
             dest_set->insert(t.destiny);
         }
 
-        return new models::Automaton({ states }, symbols, transition_table);
+        return std::make_unique<models::Automaton>(set<int>({ states }), symbols, transition_table);
     }
 
 
