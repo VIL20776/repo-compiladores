@@ -41,30 +41,38 @@ namespace models {
 
     S_tree::Syntax_tree(string regex)
     {
+        values = {};
+
         stack<node*> nodes {}; 
         int position = 1;
         for (char &c: regex) {
-            if (isalnum(c) || c == '#') {
-                nodes.push(new node(c, position));
-                position++;
-                continue;
-            }
-            if (c == '|' || c == '.') {
-                node *root = new node();
+            node *root = new node();
+            switch (c)
+            {
+            case '|':
+            case '.':
                 root->append(nodes.top(), node::RIGHT); nodes.pop();
                 root->append(nodes.top(), node::LEFT); nodes.pop();
-
+                root->value = c;
                 nodes.push(root);
-                continue;
-            }
-            if (c == '*') {
-                node *root = new node();
+                break;
+            case '*':
                 root->append(nodes.top(), node::LEFT); nodes.pop();
-
+                root->value = c;
                 nodes.push(root);
-                continue;
+                break;
+            default:
+                delete root;
+                nodes.push(new node(c, position));
+                values.insert({position, c});
+                if (c == '#') 
+                    sharp_pos = position;
+
+                position++;
+                break;
             }
         }
+        root = nodes.top();
     }
 
     S_tree::~Syntax_tree()
@@ -120,8 +128,10 @@ namespace models {
         }
     }
 
-    set<int> S_tree::first_pos(S_tree::node *node)
+    set<int> S_tree::first_pos(S_tree::node *node = nullptr)
     {
+        if (node == nullptr)
+            node = root;
 
         if (node->position > 0)
             return {node->position};
@@ -152,7 +162,6 @@ namespace models {
 
     set<int> S_tree::last_pos(node *node)
     {
-
         if (node->position > 0)
             return {node->position};
 
@@ -167,7 +176,7 @@ namespace models {
             last_pos.merge(this->last_pos(node->right));
             return last_pos;
         case '.':
-            if (this->nullable(node->left))
+            if (this->nullable(node->right))
             {
                 last_pos.merge(this->last_pos(node->left));
                 last_pos.merge(this->last_pos(node->right));
@@ -179,6 +188,8 @@ namespace models {
             return this->last_pos(node->left);
         }
     }
+
+    std::set<int> S_tree::first_pos() { return first_pos(root); }
 
     set<int> S_tree::follow_pos(int i)
     {
@@ -212,4 +223,8 @@ namespace models {
 
         return follow_pos;
     }
+
+    const std::map<int,char> &S_tree::get_values() { return values; }
+
+    int S_tree::sharp() {return sharp_pos; }
 }

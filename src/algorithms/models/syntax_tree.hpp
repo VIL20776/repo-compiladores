@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include <cstddef>
+#include <map>
 #include <string>
 
 namespace models {
@@ -25,20 +25,24 @@ namespace models {
 
     private:
         node *root;
+        std::map<int, char> values;
+        int sharp_pos;
 
         node *const find_node(node *node, int i);
         void release_nodes(node *current);
         
+        bool nullable(node *node);
+        std::set<int> first_pos(node *node);
+        std::set<int> last_pos(node *node);
     public:
         Syntax_tree(std::string regex);
         ~Syntax_tree();
 
 
-        bool nullable(node *node);
-        std::set<int> first_pos(node *node);
-        std::set<int> last_pos(node *node);
+        std::set<int> first_pos();
         std::set<int> follow_pos(int i);
-
+        const std::map<int,char> &get_values();
+        int sharp();
     };
 
 }

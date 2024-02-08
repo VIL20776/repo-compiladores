@@ -18,7 +18,9 @@ add_library(algorithms STATIC
     src/algorithms/postfix.cpp 
     src/algorithms/thompson.cpp
     src/algorithms/subsets.cpp
-    src/algorithms/models/automaton.cpp)
+    src/algorithms/direct.cpp
+    src/algorithms/models/automaton.cpp
+    src/algorithms/models/syntax_tree.cpp)
 target_include_directories(algorithms PRIVATE src/algorithms)
 
 # target_link_libraries(algorithms PUBLIC models)
