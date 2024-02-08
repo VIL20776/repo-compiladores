@@ -19,6 +19,11 @@ Automaton::Automaton(
     
 }
 
+const std::set<int> &Automaton::get_acceptance() { return acceptance; }
+const std::set<char> &Automaton::get_symbols() { return symbols; }
+const std::vector<std::map<char, std::set<int>>>
+&Automaton::get_table() { return transition_table; }
+
 bool Automaton::check(std::string word)
 {
     using std::set, std::map;
@@ -53,7 +58,7 @@ void Automaton::graph_automaton(char* name)
 
     agattr(G, AGNODE, "shape", "circle");
     agattr(G, AGRAPH, "rankdir", "LR");
-    agattr(G, AGEDGE, "label", "__");
+    agattr(G, AGEDGE, "label", "_");
     
     std::vector<Agnode_t*> nodes;
     for (int i = 0; i < size; i++)
@@ -69,11 +74,11 @@ void Automaton::graph_automaton(char* name)
     std::vector<Agedge_t*> edges;
     for (int i = 0; i < size; i++) {
         for (char c: symbols) {
-            char* edge_name = &c;
+            std::string edge_name = std::string(&c);
             if (transition_table[i].at(c).empty()) continue;
             for (auto &d: transition_table[i].at(c)) {
-                Agedge_t *edge = agedge(G, nodes[i], nodes[d], edge_name, true);
-                agset(edge, "label", edge_name);
+                Agedge_t *edge = agedge(G, nodes[i], nodes[d], edge_name.data(), true);
+                agset(edge, "label", edge_name.data());
                 edges.push_back(edge);
             }
         }

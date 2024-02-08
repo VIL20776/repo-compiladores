@@ -6,6 +6,6 @@ namespace algorithms {
     class AutomataCreator {
         public:
         virtual ~AutomataCreator() = default;
-        virtual models::Automaton create_automata() = 0;
+        virtual models::Automaton *create_automata() = 0;
     };
 }

@@ -32,11 +32,12 @@ namespace models
             transition_table);
         // ~Automaton();
 
-        bool check(std::string input);
+        const std::set<int> &get_acceptance();
+        const std::set<char> &get_symbols();
+        const std::vector<std::map<char, std::set<int>>>
+        &get_table();
 
-        std::set<int> e_closure(const int s);
-        std::set<int> e_closure(std::set<int> states);
-        std::set<int> move(std::set<int> states, char c);
+        bool check(std::string input);
 
         void graph_automaton(char *name);
     };

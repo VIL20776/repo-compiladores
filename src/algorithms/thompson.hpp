@@ -13,8 +13,8 @@ namespace algorithms {
     private:
         std::string expression;
     public:
-        Thompson(const std::string &expresion);
-        models::Automaton create_automata();
+        Thompson(const std::string &expression);
+        models::Automaton *create_automata();
     };
 
 }

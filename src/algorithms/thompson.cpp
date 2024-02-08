@@ -10,7 +10,6 @@ namespace algorithms {
         int origin, destiny;
         char symbol;
     };
-
     
     typedef std::vector<std::map<char, std::set<int>>> table;
     using std::vector, std::map, std::set;
@@ -122,7 +121,12 @@ namespace algorithms {
         return transitions.top();
     }
 
-    models::Automaton Thompson::create_automata()
+    Thompson::Thompson(const std::string &expression)
+    {
+        this->expression = expression;
+    }
+
+    models::Automaton *Thompson::create_automata()
     { 
         using std::vector;
         vector<transition> t_vector = list_transitions(expression);
@@ -155,7 +159,7 @@ namespace algorithms {
             dest_set->insert(t.destiny);
         }
 
-        return models::Automaton({ states }, symbols, transition_table);
+        return new models::Automaton({ states }, symbols, transition_table);
     }
 
 

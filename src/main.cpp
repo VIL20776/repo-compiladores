@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include "algorithms/postfix.hpp"
-#include "algorithms/models/automaton.hpp"
+#include "algorithms.hpp"
 
 int main(int argc, char const *argv[])
 {
@@ -9,8 +8,20 @@ int main(int argc, char const *argv[])
     std::string postfix = algorithms::regex_to_postfix(regex);
     std::cout << postfix << "\n";
 
-    // models::Automaton nfa (postfix, models::NFA);
-    // std::string nfa_name = "Thompson.png";
-    // nfa.graph_automaton(nfa_name.data());
+    algorithms::AutomataCreator* fa_creator = new algorithms::Thompson(postfix);
+    models::Automaton* nfa = fa_creator->create_automata();
+    std::string nfa_name = "Thompson.png";
+    nfa->graph_automaton(nfa_name.data());
+
+    fa_creator = new algorithms::Subsets(nfa);
+    models::Automaton* dfa = fa_creator->create_automata();
+    std::string dfa_name = "Subsets.png";
+    dfa->graph_automaton(dfa_name.data());
+
+
+    delete fa_creator;
+    delete nfa;
+    delete dfa;
+
     return 0;
 }
