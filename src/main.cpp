@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
     std::unique_ptr<models::Automaton> nfa {};
     std::unique_ptr<models::Automaton> dfa {};
 
-    fa_creator = std::make_unique<algorithms::Direct>(algorithms::Direct(postfix));
+    fa_creator.reset(new algorithms::Direct(postfix));
     dfa = fa_creator->create_automata();
     dfa->graph_automaton(std::string("Direct.png").data());
 
