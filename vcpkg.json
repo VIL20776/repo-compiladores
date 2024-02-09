@@ -1,0 +1,6 @@
+{
+  "dependencies": [
+    "graphviz",
+    "catch2"
+  ]
+}

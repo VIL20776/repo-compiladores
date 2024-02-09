@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fa_factory.hpp"
-#include "models/syntax_tree.hpp"
+#include "algorithms/models/syntax_tree.hpp"
 
 #include <string>
 

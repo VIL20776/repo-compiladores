@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "models/automaton.hpp"
+#include "algorithms/models/automaton.hpp"
 
 namespace algorithms {
     class AutomataCreator {

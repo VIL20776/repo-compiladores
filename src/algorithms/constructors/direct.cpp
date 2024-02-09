@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "models/syntax_tree.hpp"
+#include "algorithms/models/syntax_tree.hpp"
 
 namespace algorithms {
 
