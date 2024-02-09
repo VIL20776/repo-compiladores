@@ -61,6 +61,10 @@ namespace models {
                 root->value = c;
                 nodes.push(root);
                 break;
+            case '$':
+                delete root;
+                nodes.push(new node(c, 0));
+                break;
             default:
                 delete root;
                 nodes.push(new node(c, position));

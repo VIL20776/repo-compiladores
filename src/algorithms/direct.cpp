@@ -19,10 +19,10 @@ namespace algorithms {
 
 
         set<char> symbols {};
-        symbols.extract('#');
         map<int,char> value_map = tree.get_values();
         for (auto iter = value_map.begin(); iter != value_map.end(); ++iter)
             symbols.insert(iter->second);
+        symbols.extract('#');
 
         set<int> new_acceptance {};
         table new_table {};

@@ -17,7 +17,7 @@ namespace algorithms {
             for (auto &s: group) {
                 set<int> transitions {};
                 for (auto &c: automaton->get_symbols()){
-                    set<int> found = automaton->get_table().at(s).at(c);
+                    set<int> found = automaton->transition(s,c);
                     transitions.merge(found);
                 }
                 if (new_groups.find(transitions) == new_groups.end()) {
@@ -78,11 +78,13 @@ namespace algorithms {
 
             for (auto &c: automaton->get_symbols())
             {
-                int found = *automaton->transition(state, c).begin();
+                set<int> found = automaton->transition(state, c);
+                if(found.empty())
+                    continue;
                 //find destiny state
                 for (int j = 0; j < part.size(); j++){
                     set<int> match = part.at(j);
-                    if (match.find(found) != match.end()) {
+                    if (match.find(*found.begin()) != match.end()) {
                         transition_table.at(i)[c] = {j};
                         break;
                     }

@@ -4,7 +4,9 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = "(a|b)*abab";
+    std::string regex = "(a|$)b(a+)c?";
+    regex = algorithms::to_standard(regex);
+    std::cout << regex << "\n";
     std::string postfix = algorithms::regex_to_postfix(regex);
     std::cout << postfix << "\n";
 
@@ -12,19 +14,19 @@ int main(int argc, char const *argv[])
     std::unique_ptr<models::Automaton> nfa {};
     std::unique_ptr<models::Automaton> dfa {};
 
-    // fa_creator.reset(new algorithms::Direct(postfix));
-    // dfa = fa_creator->create_automata();
-    // dfa->graph_automaton(std::string("Direct.png").data());
+    fa_creator.reset(new algorithms::Direct(postfix));
+    dfa = fa_creator->create_automata();
+    dfa->graph_automaton(std::string("Direct.png").data());
 
     fa_creator.reset(new algorithms::Thompson(postfix));
     nfa = fa_creator->create_automata();
-    // std::string nfa_name = "Thompson.png";
-    // nfa->graph_automaton(nfa_name.data());
+    std::string nfa_name = "Thompson.png";
+    nfa->graph_automaton(nfa_name.data());
 
     fa_creator.reset(new algorithms::Subsets(nfa.release()));
     dfa = fa_creator->create_automata();
-    // std::string dfa_name = "Subsets.png";
-    // dfa->graph_automaton(dfa_name.data());
+    std::string dfa_name = "Subsets.png";
+    dfa->graph_automaton(dfa_name.data());
 
     fa_creator.reset(new algorithms::Minimize(dfa.release()));
     dfa = fa_creator->create_automata();

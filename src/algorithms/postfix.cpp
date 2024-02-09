@@ -15,21 +15,28 @@ namespace algorithms {
         using std::string, std::map;
         string explicit_concat(const string &regex)
         {
-            bool concat = false;
-            string new_regex {};
-            for (auto ch : regex)
-            {
-                if ((isalpha(ch) || ch == '(') && concat)
-                {
-                    new_regex.push_back('.');
-                    concat = false;
-                }
+            string result;
+            std::stack<char> symbols;
 
-                concat = (isalpha(ch) || ch == '*') ? true: false;
-                new_regex.push_back(ch);
+            for (size_t i = 0; i < regex.length(); ++i) {
+                char currentSymbol = regex[i];
+                result += currentSymbol;
+
+                if (currentSymbol == '(' || currentSymbol == '|')
+                    continue;
+
+                if (i < regex.length() - 1) {
+                    char nextSymbol = regex[i + 1];
+                    if (nextSymbol == '*' || nextSymbol == '|' || 
+                        nextSymbol == ')' || nextSymbol == '$'
+                    ) continue;
+                    
+
+                    result += '.';
+                }
             }
 
-            return new_regex;
+            return result;
         }
 
         void handle_parentesis(char ch, std::stack<char> &stack, string &output)

@@ -3,3 +3,4 @@
 #include "algorithms/subsets.hpp"
 #include "algorithms/minimize.hpp"
 #include "algorithms/direct.hpp"
+#include "algorithms/regex.hpp"
