@@ -32,8 +32,10 @@ namespace models
             transition_table);
         // ~Automaton();
 
+        const int &get_size();
         const std::set<int> &get_acceptance();
         const std::set<char> &get_symbols();
+        const std::set<int> &transition(int i, char c);
         const std::vector<std::map<char, std::set<int>>>
         &get_table();
 

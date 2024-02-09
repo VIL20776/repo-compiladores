@@ -19,8 +19,10 @@ Automaton::Automaton(
     
 }
 
+const int &Automaton::get_size() { return size; }
 const std::set<int> &Automaton::get_acceptance() { return acceptance; }
 const std::set<char> &Automaton::get_symbols() { return symbols; }
+const std::set<int> &Automaton::transition(int i, char c) { return transition_table.at(i).at(c); }
 const std::vector<std::map<char, std::set<int>>>
 &Automaton::get_table() { return transition_table; }
 
