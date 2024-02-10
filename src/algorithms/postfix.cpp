@@ -6,7 +6,7 @@ namespace algorithms {
 
     const std::map<char,int> precedence_map {
         {'|', 1},
-        {'.', 2},
+        {'&', 2},
         {'*', 3}
     };
 
@@ -32,7 +32,7 @@ namespace algorithms {
                     ) continue;
                     
 
-                    result += '.';
+                    result += '&';
                 }
             }
 

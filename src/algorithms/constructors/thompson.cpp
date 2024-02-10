@@ -92,7 +92,7 @@ namespace algorithms {
             vector<transition> d2 {};
             switch (c)
             {
-            case '.':
+            case '&':
                 d2 = transitions.top(); transitions.pop();
                 d1 = transitions.top(); transitions.pop();
 

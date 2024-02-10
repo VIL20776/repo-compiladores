@@ -26,26 +26,79 @@ const std::set<int> &Automaton::transition(int i, char c) { return transition_ta
 const std::vector<std::map<char, std::set<int>>>
 &Automaton::get_table() { return transition_table; }
 
-bool Automaton::check(std::string word)
+std::set<int> Automaton::e_closure(const int &state)
+    {
+        if (symbols.find('$') == symbols.end())
+            return {state};
+
+        using std::set, std::stack;
+
+        set<int> lock {state};
+        stack<int> s_stack {};
+        s_stack.push(state);
+        while (!s_stack.empty()) {
+            set<int> found = transition(s_stack.top(),'$');
+
+            s_stack.pop();
+            for (auto &s: found) if (lock.find(s) == lock.end()) {
+                s_stack.push(s);
+                lock.insert(s);
+            }
+        }
+        
+        return lock;
+    }
+
+    std::set<int> Automaton::e_closure(const std::set<int> &states) 
+    {
+        if (symbols.find('$') == symbols.end())
+            return {states};
+
+        using std::set;
+
+        set<int> lock {states};
+        for (auto &s: states) {
+            set<int> found = e_closure(s);
+            lock.merge(found);
+        }
+
+        return lock;    
+    }
+
+    std::set<int> Automaton::move(const std::set<int> &states, const char &c)
+    {
+        using std::set;
+    
+        set<int> next {};
+        for (auto &s: states) {
+            set<int> found = transition(s,c);
+            next.merge(found);
+        }
+
+        return next;   
+    }
+
+bool Automaton::simulate(std::string word)
 {
     using std::set, std::map;
     for (auto &c: word)
         if (symbols.find(c) == symbols.end()) return false;
 
-    set<int> states = {0};
+    set<int> states = e_closure(0);
     for (auto &c: word) {
         set<int> new_states = {};
         for (auto &s : states) {
-            set<int> found_states = transition_table.at(s).at(c);
-            new_states.insert(found_states.begin(), found_states.end());
+            set<int> found_states = e_closure(move(states, c));
+            new_states.merge(found_states);
         }
+        if (new_states.empty()) return false;
         states = new_states;
     }
 
     for (auto &s: states)
-        if (acceptance.find(s) == acceptance.end()) return false;
+        if (acceptance.find(s) != acceptance.end()) return true;
     
-    return true;
+    return false;
 }
 
 
@@ -75,8 +128,8 @@ void Automaton::graph_automaton(char* name)
 
     std::vector<Agedge_t*> edges;
     for (int i = 0; i < size; i++) {
-        for (char c: symbols) {
-            std::string edge_name = std::string(&c);
+        for (auto &c: symbols) {
+            std::string edge_name(1,c);
             if (transition_table[i].at(c).empty()) continue;
             for (auto &d: transition_table[i].at(c)) {
                 Agedge_t *edge = agedge(G, nodes[i], nodes[d], edge_name.data(), true);

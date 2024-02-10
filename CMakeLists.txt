@@ -5,17 +5,14 @@ cmake_minimum_required(VERSION 3.0.0)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 project(Compilador VERSION 0.1.0 LANGUAGES C CXX)
 
-# include(CTest)
-# enable_testing()
-
-# find_package(libcgraph CONFIG)
+# Dependencies
 find_package(Catch2 CONFIG)
 
 find_library(cgraph libcgraph NAMES cgraph)
 find_library(gvc libgvc NAMES gvc)
+find_path(VCPKG_INCLUDE_DIR graphviz PATHS ${CMAKE_CURRENT_BINARY_DIR})
 
-find_path(GRAPHVIZ_INCLUDE_DIR graphviz PATHS ${CMAKE_CURRENT_BINARY_DIR} REQUIRED)
-
+# Algoritms sources
 add_library(algorithms STATIC 
     src/algorithms/regex.cpp
     src/algorithms/postfix.cpp 
@@ -25,15 +22,26 @@ add_library(algorithms STATIC
     src/algorithms/constructors/direct.cpp
     src/algorithms/models/automaton.cpp
     src/algorithms/models/syntax_tree.cpp)
-target_include_directories(algorithms PRIVATE src ${GRAPHVIZ_INCLUDE_DIR})
+target_include_directories(algorithms PRIVATE src ${VCPKG_INCLUDE_DIR})
 target_link_libraries(algorithms PRIVATE ${cgraph} ${gvc})
 
-# target_link_libraries(algorithms PUBLIC models)
-
+# Compiler executable
 add_executable(Compilador src/main.cpp)
-target_include_directories(Compilador PRIVATE src ${GRAPHVIZ_INCLUDE_DIR})
+target_include_directories(Compilador PRIVATE src ${VCPKG_INCLUDE_DIR})
 
 target_link_libraries(Compilador PRIVATE algorithms)
+
+# Test executables
+add_executable(regex.test tests/regex.test.cpp)
+target_include_directories(regex.test PRIVATE src ${VCPKG_INCLUDE_DIR})
+
+target_link_libraries(regex.test PRIVATE algorithms Catch2::Catch2 Catch2::Catch2WithMain)
+
+include(CTest)
+enable_testing()
+
+include(Catch)
+catch_discover_tests(regex.test)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

@@ -8,7 +8,7 @@
 namespace algorithms {
 
     Direct::Direct(std::string expression): 
-        tree(expression + "#.") {};
+        tree(expression + "#&") {};
 
     std::unique_ptr<models::Automaton> Direct::create_automata ()
     {

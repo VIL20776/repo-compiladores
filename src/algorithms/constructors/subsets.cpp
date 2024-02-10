@@ -6,52 +6,6 @@
 
 namespace algorithms {
 
-    std::set<int> Subsets::e_closure(const int &state)
-    {
-        using std::set, std::stack;
-
-        set<int> lock {state};
-        stack<int> s_stack {};
-        s_stack.push(state);
-        while (!s_stack.empty()) {
-            set<int> found = automaton->get_table().at(s_stack.top()).at('$');
-
-            s_stack.pop();
-            for (auto &s: found) if (lock.find(s) == lock.end()) {
-                s_stack.push(s);
-                lock.insert(s);
-            }
-        }
-        
-        return lock;
-    }
-
-    std::set<int> Subsets::e_closure(const std::set<int> &states) 
-    {
-        using std::set;
-
-        set<int> lock {states};
-        for (auto &s: states) {
-            set<int> found = e_closure(s);
-            lock.insert(found.begin(), found.end());
-        }
-
-        return lock;    
-    }
-
-    std::set<int> Subsets::move(const std::set<int> &states, const char &c)
-    {
-        using std::set;
-    
-        set<int> lock {};
-        for (auto &s: states) {
-            set<int> found = automaton->get_table().at(s).at(c);
-            lock.insert(found.begin(), found.end());
-        }
-
-        return lock;   
-    }
-
     Subsets::Subsets(models::Automaton *automaton)
     {
         this->automaton = automaton;
@@ -71,7 +25,7 @@ namespace algorithms {
         table new_table {};
 
         vector<set<int>> found_states {};
-        found_states.push_back(e_closure(0));
+        found_states.push_back(automaton->e_closure(0));
 
         int mark = 0;
         while (mark < found_states.size())
@@ -80,7 +34,7 @@ namespace algorithms {
             map<char, set<int>> new_tran {};
             for (auto &c : symbols)
             {
-                set<int> new_state = e_closure(move(marked_state, c));
+                set<int> new_state = automaton->e_closure(automaton->move(marked_state, c));
                 if (new_state.empty()) {
                     new_tran[c] = {};
                     continue;

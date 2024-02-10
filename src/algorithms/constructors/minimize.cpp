@@ -69,6 +69,19 @@ namespace algorithms {
             }
             transition_table.push_back(init);
         }
+
+        //Make sure partition on index 0 contains state 0
+        if (part.at(0).find(0) == part.at(0).end())
+        {
+            for (auto iter = part.begin(); iter < part.end(); ++iter)
+            {
+                if (*iter->find(0) != *iter->end()) {
+                    set<int> start = *iter;
+                    part.erase(iter);
+                    part.insert(part.begin(), start);
+                }
+            }
+        }
         
         // Make transitions
         for (int i = 0; i < part.size(); i++) //origin states

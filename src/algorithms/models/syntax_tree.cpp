@@ -50,7 +50,7 @@ namespace models {
             switch (c)
             {
             case '|':
-            case '.':
+            case '&':
                 root->append(nodes.top(), node::RIGHT); nodes.pop();
                 root->append(nodes.top(), node::LEFT); nodes.pop();
                 root->value = c;
@@ -124,7 +124,7 @@ namespace models {
         case '|':
             return (nullable(node->left) | nullable(node->right));
 
-        case '.':
+        case '&':
             return (nullable(node->left) & nullable(node->right));
 
         default:
@@ -132,11 +132,8 @@ namespace models {
         }
     }
 
-    set<int> S_tree::first_pos(S_tree::node *node = nullptr)
+    set<int> S_tree::first_pos(S_tree::node *node)
     {
-        if (node == nullptr)
-            node = root;
-
         if (node->position > 0)
             return {node->position};
 
@@ -150,7 +147,7 @@ namespace models {
             first_pos.merge(this->first_pos(node->left));
             first_pos.merge(this->first_pos(node->right));
             return first_pos;
-        case '.':
+        case '&':
             if (nullable(node->left))
             {
                 first_pos.merge(this->first_pos(node->left));
@@ -179,7 +176,7 @@ namespace models {
             last_pos.merge(this->last_pos(node->left));
             last_pos.merge(this->last_pos(node->right));
             return last_pos;
-        case '.':
+        case '&':
             if (this->nullable(node->right))
             {
                 last_pos.merge(this->last_pos(node->left));
@@ -205,7 +202,7 @@ namespace models {
             set<int> check {};
             switch (temp->value)
             {
-            case '.':
+            case '&':
                 check = last_pos(temp->left);
 
                 if (check.find(i) != check.end())

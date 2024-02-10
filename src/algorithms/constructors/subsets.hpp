@@ -10,10 +10,6 @@ namespace algorithms {
     {
         models::Automaton *automaton;
 
-        std::set<int> e_closure(const std::set<int> &states); 
-        std::set<int> e_closure(const int &state); 
-    std::set<int> move(const std::set<int> &states, const char &c); 
-
         public:
         Subsets(models::Automaton *automaton);
         std::unique_ptr<models::Automaton> create_automata (); 

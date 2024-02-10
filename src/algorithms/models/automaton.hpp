@@ -39,7 +39,11 @@ namespace models
         const std::vector<std::map<char, std::set<int>>>
         &get_table();
 
-        bool check(std::string input);
+        std::set<int> e_closure(const int &state);
+        std::set<int> e_closure(const std::set<int> &states);
+        std::set<int> move(const std::set<int> &states, const char &c);
+    
+        bool simulate(std::string input);
 
         void graph_automaton(char *name);
     };
