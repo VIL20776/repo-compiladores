@@ -134,8 +134,6 @@ namespace models {
 
     set<int> S_tree::first_pos(S_tree::node *node)
     {
-        if (node->position > 0)
-            return {node->position};
 
         set<int> first_pos {};
         switch (node->value)
@@ -158,13 +156,15 @@ namespace models {
         
         case '*':
             return this->first_pos(node->left);
+
+        default:
+            return {node->position};
+
         }
     }
 
     set<int> S_tree::last_pos(node *node)
     {
-        if (node->position > 0)
-            return {node->position};
 
         set<int> last_pos {};
         switch (node->value)
@@ -187,6 +187,9 @@ namespace models {
         
         case '*':
             return this->last_pos(node->left);
+        
+        default:
+            return {node->position};
         }
     }
 

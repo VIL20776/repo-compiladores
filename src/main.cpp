@@ -15,6 +15,14 @@ int simulation_mesage(bool result)
 int main(int argc, char const *argv[])
 {
     std::string regex = "(a|b)*a(a|b)(a|b)";
+    std::string word = "baaab";
+
+    if (argc == 3)
+    {
+        regex = std::string(argv[1]);
+        word = std::string(argv[2]);
+    }
+
     bool check = algorithms::check_parenthesis(regex);
     if (!check) {
         std::cout << "Falta un parentesis de cierre o apertura. Saliendo del programa" << '\n';
@@ -30,7 +38,6 @@ int main(int argc, char const *argv[])
     std::unique_ptr<models::Automaton> nfa {};
     std::unique_ptr<models::Automaton> dfa {};
 
-    std::string word = "baaab";
 
     fa_creator.reset(new algorithms::Direct(postfix));
     dfa = fa_creator->create_automata();
