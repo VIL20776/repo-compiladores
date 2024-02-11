@@ -14,7 +14,7 @@ int simulation_mesage(bool result)
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = "(a|b)*a(a|b)(a|b)";
+    std::string regex = "a+?";
     std::string word = "baaab";
 
     if (argc == 3)

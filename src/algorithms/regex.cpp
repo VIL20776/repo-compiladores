@@ -11,10 +11,6 @@ namespace algorithms {
         return count_open == count_close;
     }
 
-    bool operator_check(const std::string& str) {
-        
-    }
-
     std::string extract_substring(std::string& str, int closing_index) {
         // Buscar el índice del paréntesis de apertura correspondiente al índice del paréntesis de cierre proporcionado
         int opening_index = -1;
@@ -52,20 +48,22 @@ namespace algorithms {
             switch (regex.at(i))
             {
             case '+':
-                if (regex.at(i - 1) == ')') {
+                if (std_regex.back() == ')') {
                     std::string substring = extract_substring(std_regex, std_regex.size() - 1);
-                    std_regex.append(string() + substring + substring + "*");
-                } else 
-                    std_regex.append(string() + regex.at(i - 1) + "*");
+                    std_regex.append(string("(") + substring + substring + "*)");
+                } else  {
+                    std_regex.pop_back();
+                    std_regex.append(string("(") + regex.at(i - 1) + regex.at(i - 1) + "*)");
+                }
                 break;
             case '?':
-                if (regex.at(i - 1) == ')') {
+                if (std_regex.back() == ')') {
                     std::string substring = extract_substring(std_regex, std_regex.size() - 1);
-                    std_regex.append(string() + "($|" + substring + ")");
+                    std_regex.append(string("($|") + substring + ")");
                 } else
                 {
                     std_regex.pop_back();
-                    std_regex.append(string() + "($|" + regex.at(i - 1) + ")");
+                    std_regex.append(string("($|") + regex.at(i - 1) + ")");
                 }
                 break;
             default:
