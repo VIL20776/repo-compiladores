@@ -105,15 +105,16 @@ bool Automaton::simulate(std::string word)
 
 void Automaton::graph_automaton(char* name)
 {
+    using std::string;
     Agraph_t* G;
     GVC_t* gvc;
 
     gvc = gvContext();
     G = agopen(name, Agdirected, 0);
 
-    agattr(G, AGNODE, "shape", "circle");
-    agattr(G, AGRAPH, "rankdir", "LR");
-    agattr(G, AGEDGE, "label", "_");
+    agattr(G, AGNODE, string("shape").data(), string("circle").data());
+    agattr(G, AGRAPH, string("rankdir").data(), string("LR").data());
+    agattr(G, AGEDGE, string("label").data(), string("_").data());
     
     std::vector<Agnode_t*> nodes;
     for (int i = 0; i < size; i++)
@@ -122,7 +123,7 @@ void Automaton::graph_automaton(char* name)
         Agnode_t *node = agnode(G, node_name, true);
         nodes.push_back(node);
         if (acceptance.find(i) != acceptance.end()) 
-            agset(node, "shape", "doublecircle");
+            agset(node, string("shape").data(), string("doublecircle").data());
     }
     
 
@@ -133,7 +134,7 @@ void Automaton::graph_automaton(char* name)
             if (transition_table[i].at(c).empty()) continue;
             for (auto &d: transition_table[i].at(c)) {
                 Agedge_t *edge = agedge(G, nodes[i], nodes[d], edge_name.data(), true);
-                agset(edge, "label", edge_name.data());
+                agset(edge, string("label").data(), edge_name.data());
                 edges.push_back(edge);
             }
         }
