@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-# set(CXX_STANDARD 20)
-# set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAUKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 project(Compilador VERSION 0.1.1 LANGUAGES C CXX)
 
@@ -24,6 +24,10 @@ add_library(algorithms STATIC
     src/algorithms/models/syntax_tree.cpp)
 target_include_directories(algorithms PRIVATE src ${VCPKG_INCLUDE_DIR})
 target_link_libraries(algorithms PRIVATE ${cgraph} ${gvc})
+
+add_library(yalex STATIC
+    src/analyzer/yalex.cpp)
+target_include_directories(yalex PRIVATE src)
 
 # Compiler executable
 add_executable(Compilador src/main.cpp)

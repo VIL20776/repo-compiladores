@@ -1,6 +1,0 @@
-#include "algorithms/postfix.hpp"
-#include "algorithms/regex.hpp"
-#include "algorithms/constructors/thompson.hpp"
-#include "algorithms/constructors/subsets.hpp"
-#include "algorithms/constructors/minimize.hpp"
-#include "algorithms/constructors/direct.hpp"

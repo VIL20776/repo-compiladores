@@ -1,0 +1,6 @@
+#include "postfix.hpp"
+#include "regex.hpp"
+#include "constructors/thompson.hpp"
+#include "constructors/subsets.hpp"
+#include "constructors/minimize.hpp"
+#include "constructors/direct.hpp"

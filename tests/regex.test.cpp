@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "algorithms.hpp"
+#include "algorithms/algorithms.hpp"
 
 enum valitation {succes, fail};
 bool simulation_test(std::string regex, std::string word, bool validate)
