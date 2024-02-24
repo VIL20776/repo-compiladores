@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "algorithms.hpp"
+#include "algorithms/algorithms.hpp"
 
 int simulation_mesage(bool result)
 {
