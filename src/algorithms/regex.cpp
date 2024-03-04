@@ -9,10 +9,7 @@ namespace algorithms {
         int count_open = std::count(str.begin(), str.end(), pair[0]);
         int count_close = std::count(str.begin(), str.end(), pair[1]);
 
-        if (count_open == count_close)
-            return count_close;
-        else
-            return -1;
+        return count_open - count_close;
     }
 
     std::string extract_substring(std::string& str, int closing_index, std::array<char,2> bounds) {
@@ -42,11 +39,39 @@ namespace algorithms {
         return substring;
     }
 
-    // std::string replace_char_class (const std::string &char_class)
-    // {
+    std::string replace_char_class (const std::string &char_class)
+    {
+        std::string char_set = "";
+        bool range = false;
+        for (size_t i; i < char_class.size(); i++) {
+            char c = char_class.at(i);
+            switch (c)
+            {
+            case '\'':
+            case '\"':
+                break;
+            case '-':
+                range = true;
+                break;
+            default:
+                if (range) {
+                    char start = char_set.back() + 1;
+                    char end = c;
+                    for (char j = start; j < end; j++)
+                        char_set += "\'" + std::string(j,1) + "\'|";
+                    
+                    range = false;
+                }
+
+                char_set.push_back(c);
+                if (i == char_class.size() - 1)
+                    char_set.push_back('|');
+                break;
+            }
+        }
         
-        
-    // }
+        return char_set;
+    }
 
     std::string replace_extentions (std::string regex)
     {
@@ -77,10 +102,10 @@ namespace algorithms {
                     std_regex.append(string("($|") + regex.at(i - 1) + ")");
                 }
                 break;
-            // case ']':
-            //     substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'});
-            //     std_regex.append(string("(") + replace_char_class(substring) + ")");
-            //     break;
+            case ']':
+                substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'});
+                std_regex.append(string("(") + replace_char_class(substring) + ")");
+                break;
             default:
                 std_regex.push_back(regex.at(i));
                 break;
@@ -92,13 +117,11 @@ namespace algorithms {
 
     std::string to_standard(std::string regex)
     {
-        if (check_char_pairs(regex, {'(',')'}) > 0) {
-
-        }
+        if (check_char_pairs(regex, {'(',')'}) != 0 || 
+            check_char_pairs(regex, {'[',']'}) != 0)
+            return "\0";
         
-        if (check_char_pairs(regex, {'[',']'}) > 0) {
-
-        }
+        
     }
 
 }
