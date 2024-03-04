@@ -33,7 +33,7 @@ target_include_directories(yalex PRIVATE src)
 add_executable(Compilador src/main.cpp)
 target_include_directories(Compilador PRIVATE src ${VCPKG_INCLUDE_DIR})
 
-target_link_libraries(Compilador PRIVATE algorithms)
+target_link_libraries(Compilador PRIVATE algorithms yalex)
 
 # Test executables
 add_executable(regex.test tests/regex.test.cpp)

@@ -42,11 +42,11 @@ namespace algorithms {
         return substring;
     }
 
-    std::string replace_char_class (const std::string &char_class)
-    {
+    // std::string replace_char_class (const std::string &char_class)
+    // {
         
         
-    }
+    // }
 
     std::string replace_extentions (std::string regex)
     {
@@ -77,9 +77,10 @@ namespace algorithms {
                     std_regex.append(string("($|") + regex.at(i - 1) + ")");
                 }
                 break;
-            case ']':
-                substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'});
-                std_regex.append(string("(") + replace_char_class(substring) + "*)");
+            // case ']':
+            //     substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'});
+            //     std_regex.append(string("(") + replace_char_class(substring) + ")");
+            //     break;
             default:
                 std_regex.push_back(regex.at(i));
                 break;

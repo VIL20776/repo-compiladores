@@ -7,13 +7,12 @@ namespace analyzer {
 class Yalex
 {
 private:
-    std::string yal_content;
+    char* yal_content;
 
     void read();
     
 public:
     Yalex(std::string path);
-    ~Yalex();
 
 
 };
