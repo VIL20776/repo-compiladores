@@ -17,12 +17,19 @@ namespace algorithms {
         {
             string result;
             std::stack<char> symbols;
+            bool literal = false;
 
             for (size_t i = 0; i < regex.length(); ++i) {
                 char currentSymbol = regex[i];
                 result += currentSymbol;
 
-                if (currentSymbol == '(' || currentSymbol == '|')
+                if (currentSymbol == '\'' || currentSymbol == '\"')
+                {
+                    literal = !literal;
+                    if (literal) continue;
+                }
+
+                if (literal || currentSymbol == '(' || currentSymbol == '|')
                     continue;
 
                 if (i < regex.length() - 1) {
@@ -31,7 +38,6 @@ namespace algorithms {
                         nextSymbol == ')' || nextSymbol == '$'
                     ) continue;
                     
-
                     result += '&';
                 }
             }

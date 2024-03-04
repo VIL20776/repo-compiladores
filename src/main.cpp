@@ -5,7 +5,7 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = "(let#)|(rule#)";
+    std::string regex = "(\"let\"#)|(\'r\'ule#)";
     std::string word = "let";
 
     if (argc == 3)
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     std::cout << postfix << "\n";
 
     std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
-    std::unique_ptr<models::Automaton> nfa {};
+    // std::unique_ptr<models::Automaton> nfa {};
     std::unique_ptr<models::Automaton> dfa {};
 
 

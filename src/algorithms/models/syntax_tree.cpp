@@ -45,14 +45,26 @@ namespace models {
 
         stack<node*> nodes {}; 
         int position = 1;
-        for (char &c: regex) {
-            node *root = new node();
-            bool literal = false;
-            // while (literal)
-            // {
-                
-            // }
+        bool literal = false; bool concat = false;
+        for (char c : regex){
             
+            if (literal && !(c == '\'' || c == '\"')) {
+                nodes.push(new node(c, position));
+                values.insert({position, c});
+                position++;
+                if (concat) {
+                    node *root = new node();
+                    root->append(nodes.top(), node::RIGHT); nodes.pop();
+                    root->append(nodes.top(), node::LEFT); nodes.pop();
+                    root->value = '&';
+                    nodes.push(root);
+                }
+                concat = true;
+                continue;
+            }
+
+            concat = false;
+            node *root = new node();
             switch (c)
             {
             case '|':
@@ -70,6 +82,11 @@ namespace models {
             case '$':
                 delete root;
                 nodes.push(new node(c, 0));
+                break;
+            case '\'':
+            case '\"':
+                delete root;
+                literal = !literal;
                 break;
             default:
                 delete root;
@@ -122,6 +139,9 @@ namespace models {
 
     bool S_tree::nullable(S_tree::node *node)
     {
+        if (node->position > 0)
+            return false;
+            
         switch (node->value)
         {
         case '*': case '$':
@@ -140,6 +160,8 @@ namespace models {
 
     set<int> S_tree::first_pos(S_tree::node *node)
     {
+        if (node->position > 0)
+            return {node->position};
 
         set<int> first_pos {};
         switch (node->value)
@@ -171,6 +193,8 @@ namespace models {
 
     set<int> S_tree::last_pos(node *node)
     {
+        if (node->position > 0)
+            return {node->position};
 
         set<int> last_pos {};
         switch (node->value)
@@ -209,18 +233,19 @@ namespace models {
 
         while (temp != nullptr) {
             set<int> check {};
+            if (temp->position == 0)
             switch (temp->value)
             {
             case '&':
                 check = last_pos(temp->left);
 
-                if (check.find(i) != check.end())
+                if (check.contains(i))
                     follow_pos.merge(first_pos(temp->right));
                 break;
             
             case '*':
                 check = last_pos(temp);
-                if (check.find(i) != check.end())
+                if (check.contains(i))
                     follow_pos.merge(first_pos(temp));
                 break;
             
