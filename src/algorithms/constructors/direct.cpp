@@ -15,8 +15,7 @@ namespace algorithms {
         typedef std::vector<std::map<char, std::set<int>>> table;
         using std::set, std::map, std::vector;
 
-        int acceptance = tree.sharp();
-
+        set<int> acceptance = tree.sharp();
 
         set<char> symbols {};
         map<int,char> value_map = tree.get_values();
@@ -57,7 +56,13 @@ namespace algorithms {
 
             }
 
-            if (marked_state.find(tree.sharp()) != marked_state.end()) 
+            vector<int> intersection = {};
+            std::set_intersection(
+                marked_state.begin(), marked_state.end(),
+                acceptance.begin(), acceptance.end(),
+                std::back_inserter(intersection)
+            );
+            if (!intersection.empty()) 
                 new_acceptance.insert(mark);
                 
             new_table.push_back(new_tran);

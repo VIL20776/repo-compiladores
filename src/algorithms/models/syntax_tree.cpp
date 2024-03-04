@@ -47,6 +47,12 @@ namespace models {
         int position = 1;
         for (char &c: regex) {
             node *root = new node();
+            bool literal = false;
+            // while (literal)
+            // {
+                
+            // }
+            
             switch (c)
             {
             case '|':
@@ -70,7 +76,7 @@ namespace models {
                 nodes.push(new node(c, position));
                 values.insert({position, c});
                 if (c == '#') 
-                    sharp_pos = position;
+                    sharp_pos.insert(position);
 
                 position++;
                 break;
@@ -230,5 +236,5 @@ namespace models {
 
     const std::map<int,char> &S_tree::get_values() { return values; }
 
-    int S_tree::sharp() {return sharp_pos; }
+    std::set<int> S_tree::sharp() { return sharp_pos; }
 }
