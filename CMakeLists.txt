@@ -8,9 +8,9 @@ project(Compilador VERSION 0.1.1 LANGUAGES C CXX)
 # Dependencies
 find_package(Catch2 CONFIG)
 
-find_library(cgraph libcgraph NAMES cgraph)
+find_path(VCPKG_INCLUDE_DIR graphviz PATHS ${CMAKE_CURRENT_BINARY_DIR} REQUIRED)
+find_library(cgraph libcgraph NAMES cgraph REQUIRED)
 find_library(gvc libgvc NAMES gvc)
-find_path(VCPKG_INCLUDE_DIR graphviz PATHS ${CMAKE_CURRENT_BINARY_DIR})
 
 # Algoritms sources
 add_library(algorithms STATIC 
@@ -27,7 +27,7 @@ target_link_libraries(algorithms PRIVATE ${cgraph} ${gvc})
 
 add_library(yalex STATIC
     src/analyzer/yalex.cpp)
-target_include_directories(yalex PRIVATE src)
+target_include_directories(yalex PRIVATE src ${VCPKG_INCLUDE_DIR})
 
 # Compiler executable
 add_executable(Compilador src/main.cpp)

@@ -5,7 +5,7 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = "(\"let\"#)|(\'r\'ule#)";
+    std::string regex = "[\'a\'-\'z\'\'A\'-\'Z\']";
     std::string word = "let";
 
     if (argc == 3)
@@ -14,16 +14,10 @@ int main(int argc, char const *argv[])
         word = std::string(argv[2]);
     }
 
-    // bool check = algorithms::check_parenthesis(regex);
-    // if (!check) {
-    //     std::cout << "Falta un parentesis de cierre o apertura. Saliendo del programa" << '\n';
-    //     return 1;
-    // }
+    // analyzer::Yalex("./slr-1.yal");
 
-    // regex = algorithms::to_standard(regex);
-
-    analyzer::Yalex("./slr-1.yal");
-
+    std::cout << regex << "\n";
+    regex = algorithms::to_standard(regex);
     std::cout << regex << "\n";
     std::string postfix = algorithms::regex_to_postfix(regex);
     std::cout << postfix << "\n";

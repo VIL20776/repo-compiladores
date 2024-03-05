@@ -12,7 +12,7 @@ namespace algorithms {
         return count_open - count_close;
     }
 
-    std::string extract_substring(std::string& str, int closing_index, std::array<char,2> bounds) {
+    std::string extract_substring(std::string& str, int closing_index, std::array<char,2> bounds, bool exclusive = false) {
         // Buscar el índice del paréntesis de apertura correspondiente al índice del paréntesis de cierre proporcionado
         int opening_index = -1;
         int count = 0;
@@ -34,7 +34,7 @@ namespace algorithms {
         }
 
         // Extraer la subcadena entre los índices de paréntesis de apertura y cierre
-        std::string substring = str.substr(opening_index, closing_index - opening_index + 1);
+        std::string substring = str.substr(opening_index + exclusive, closing_index - opening_index + 1 - 2*exclusive);
         str.erase(opening_index, closing_index - opening_index + 1);
         return substring;
     }
@@ -43,7 +43,8 @@ namespace algorithms {
     {
         std::string char_set = "";
         bool range = false;
-        for (size_t i; i < char_class.size(); i++) {
+        char start = '\0';
+        for (size_t i = 0; i < char_class.size(); i++) {
             char c = char_class.at(i);
             switch (c)
             {
@@ -55,16 +56,16 @@ namespace algorithms {
                 break;
             default:
                 if (range) {
-                    char start = char_set.back() + 1;
                     char end = c;
-                    for (char j = start; j < end; j++)
-                        char_set += "\'" + std::string(j,1) + "\'|";
+                    for (char j = start + 1; j < end; j++)
+                        char_set.append(std::string("\'") + j + "\'|");
                     
                     range = false;
                 }
 
-                char_set.push_back(c);
-                if (i == char_class.size() - 1)
+                char_set.append(std::string("\'") + c + "\'");
+                start = c;
+                if (i < char_class.size() - 2)
                     char_set.push_back('|');
                 break;
             }
@@ -103,8 +104,10 @@ namespace algorithms {
                 }
                 break;
             case ']':
-                substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'});
-                std_regex.append(string("(") + replace_char_class(substring) + ")");
+                std_regex += ']';
+                substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'}, true);
+                substring = replace_char_class(substring);
+                std_regex.append(string("(") + substring + ")");
                 break;
             default:
                 std_regex.push_back(regex.at(i));
@@ -121,7 +124,7 @@ namespace algorithms {
             check_char_pairs(regex, {'[',']'}) != 0)
             return "\0";
         
-        
+        return replace_extentions(regex);
     }
 
 }
