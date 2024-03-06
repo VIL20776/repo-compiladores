@@ -106,6 +106,18 @@ bool Automaton::simulate(std::string word)
 void Automaton::graph_automaton(char* name)
 {
     using std::string;
+    const std::map<char,std::string> non_printable = {
+        {0, "NUL"},{1, "SOH"},{2, "STX"},{3, "ETX"},
+        {4, "EOT"},{5, "ENQ"},{6, "ACK"},{7, "BEL"},
+        {8, "BS"},{9, "HT"},{10, "LF"},{11, "VT"},
+        {12, "FF"},{13, "CR"},{14, "SO"},{15, "SI"},
+        {16, "DLE"},{17, "DC1"},{18, "DC2"},{19, "DC3"},
+        {20, "DC4"},{21, "NAK"},{22, "SYN"},{23, "ETB"},
+        {24, "CAN"},{25, "EM"},{26, "SUB"},{27, "ESC"},
+        {28, "FS"},{29, "GS"},{30, "RS"},{31, "US"},
+        {32, "(space)"},{127, "DEL"}
+    };
+
     Agraph_t* G;
     GVC_t* gvc;
 
@@ -130,7 +142,10 @@ void Automaton::graph_automaton(char* name)
     std::vector<Agedge_t*> edges;
     for (int i = 0; i < size; i++) {
         for (auto &c: symbols) {
-            std::string edge_name(1,c);
+            std::string edge_name = (non_printable.contains(c)) ?
+                non_printable.at(c):
+                std::string(1, c);
+
             if (transition_table[i].at(c).empty()) continue;
             for (auto &d: transition_table[i].at(c)) {
                 Agedge_t *edge = agedge(G, nodes[i], nodes[d], edge_name.data(), true);
