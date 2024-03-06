@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <set>
+#include <map>
 
 namespace algorithms {
 
@@ -92,7 +93,13 @@ namespace algorithms {
         return expression;
     }
 
-    std::string replace_extentions (std::string regex)
+    const std::map<char,char> escape_chars = {
+        {'t','\t'},
+        {'n','\n'},
+        {'s',' '}
+    };
+
+    std::string replace_extentions (const std::string &regex)
     {
         using std::string;
 
@@ -100,7 +107,8 @@ namespace algorithms {
         string substring = "";
         for (int i = 0; i < regex.size(); i++)
         {
-            switch (regex.at(i))
+            char ch = regex.at(i);
+            switch (ch)
             {
             case '+':
                 if (std_regex.back() == ')') {
@@ -124,8 +132,14 @@ namespace algorithms {
             case ']':
                 std_regex += ']';
                 substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'}, true);
-                substring = replace_char_class(substring);
-                std_regex.append(string("(") + substring + ")");
+                std_regex.append(string("(") + replace_char_class(substring) + ")");
+                break;
+            case '\\':
+                ch = regex.at(++i);
+                if (escape_chars.contains(ch)) {
+                    std_regex.push_back(escape_chars.at(ch));
+                } else 
+                    std_regex.push_back(ch);
                 break;
             default:
                 std_regex.push_back(regex.at(i));
@@ -136,7 +150,7 @@ namespace algorithms {
         return std_regex;
     }
 
-    std::string to_standard(std::string regex)
+    std::string to_standard(const std::string &regex)
     {
         if (check_char_pairs(regex, {'(',')'}) != 0 || 
             check_char_pairs(regex, {'[',']'}) != 0)
