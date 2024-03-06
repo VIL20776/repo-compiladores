@@ -46,9 +46,9 @@ namespace models {
         stack<node*> nodes {}; 
         int position = 1;
         bool literal = false; bool concat = false;
-        for (char c : regex){
-            
-            if (literal && !(c == '\'' || c == '\"')) {
+        for (size_t i = 0; i < regex.size(); i++){
+            char c = regex.at(i);
+            if (literal && !(c == '\"')) {
                 nodes.push(new node(c, position));
                 values.insert({position, c});
                 position++;
@@ -84,6 +84,12 @@ namespace models {
                 nodes.push(new node(c, 0));
                 break;
             case '\'':
+                delete root;
+                c = regex.at(++i);
+                nodes.push(new node(c, position));
+                values.insert({position, c});
+                position++; i++;
+                break;
             case '\"':
                 delete root;
                 literal = !literal;

@@ -5,7 +5,7 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = "[\'a\'-\'z\'\'A\'-\'Z\']";
+    std::string regex = "[^\'a\'-\'z\'\'A\'-\'Z\']";
     std::string word = "let";
 
     if (argc == 3)

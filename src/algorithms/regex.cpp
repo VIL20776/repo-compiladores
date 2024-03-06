@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <set>
 
 namespace algorithms {
 
@@ -41,10 +42,13 @@ namespace algorithms {
 
     std::string replace_char_class (const std::string &char_class)
     {
-        std::string char_set = "";
+        using std::string;
+        std::set<char> char_set= {};
         bool range = false;
         char start = '\0';
-        for (size_t i = 0; i < char_class.size(); i++) {
+        // find chars in set
+        bool inverse = char_class.starts_with('^');
+        for (size_t i = inverse; i < char_class.size(); i++) {
             char c = char_class.at(i);
             switch (c)
             {
@@ -58,20 +62,34 @@ namespace algorithms {
                 if (range) {
                     char end = c;
                     for (char j = start + 1; j < end; j++)
-                        char_set.append(std::string("\'") + j + "\'|");
+                        char_set.insert(j);
                     
                     range = false;
                 }
 
-                char_set.append(std::string("\'") + c + "\'");
+                char_set.insert(c);
                 start = c;
-                if (i < char_class.size() - 2)
-                    char_set.push_back('|');
                 break;
             }
         }
         
-        return char_set;
+        string expression = "";
+
+        if (inverse) {
+            for (char i = 0; i >= 0; i++)
+            if (!char_set.contains(i)) {
+                expression.append(string("\'") + i + "\'");
+                if (i != 127) expression.push_back('|');
+            }
+        }
+        else {
+            for (auto it = char_set.begin(); it != char_set.end(); it++) {
+                expression.append(string("\'") + *it + "\'");
+                if (*it != *char_set.rbegin()) expression.push_back('|');
+            }
+        }
+        
+        return expression;
     }
 
     std::string replace_extentions (std::string regex)

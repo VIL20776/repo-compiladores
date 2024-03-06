@@ -23,10 +23,15 @@ namespace algorithms {
                 char currentSymbol = regex[i];
                 result += currentSymbol;
 
-                if (currentSymbol == '\'' || currentSymbol == '\"')
-                {
+                if (currentSymbol == '\"') {
                     literal = !literal;
                     if (literal) continue;
+                }
+
+                if (currentSymbol == '\'') {
+                    result += regex[++i]; 
+                    result += regex[++i];
+                    continue;
                 }
 
                 if (literal || currentSymbol == '(' || currentSymbol == '|')
@@ -87,19 +92,32 @@ namespace algorithms {
     using std::string, std::map;
     string regex_to_postfix(string &infix) {
         string output {};
+        bool literal = false;
         std::stack<char> stack {};
 
-        string explicit_regex = explicit_concat(infix);
+        string exp_regex = explicit_concat(infix);
 
-        for (char ch : explicit_regex)
+        for (size_t i = 0; i < exp_regex.size(); i++)
         {
+            char ch = exp_regex[i];
             if (ch == '(' || ch == ')')
             {
                 handle_parentesis(ch, stack, output);   
                 continue;         
             }
+            if (ch == '\"') {
+                literal = !literal;
+                if (literal) continue;
+            }
+
+            if (ch == '\'') {
+                output.push_back(ch);
+                output.push_back(exp_regex[++i]); 
+                output.push_back(exp_regex[++i]);
+                continue;
+            }
             
-            if (precedence_map.find(ch) == precedence_map.end())
+            if (literal || !precedence_map.contains(ch))
             {
                 output.push_back(ch);
                 continue;
