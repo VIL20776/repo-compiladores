@@ -11,9 +11,6 @@
 
 namespace models
 {
-    enum FA_type {DFA, NFA};
-
-
     class Automaton
     {
     

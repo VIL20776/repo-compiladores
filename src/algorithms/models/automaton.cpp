@@ -27,56 +27,56 @@ const std::vector<std::map<char, std::set<int>>>
 &Automaton::get_table() { return transition_table; }
 
 std::set<int> Automaton::e_closure(const int &state)
-    {
-        if (symbols.find('$') == symbols.end())
-            return {state};
+{
+    if (!symbols.contains('$'))
+        return {state};
 
-        using std::set, std::stack;
+    using std::set, std::stack;
 
-        set<int> lock {state};
-        stack<int> s_stack {};
-        s_stack.push(state);
-        while (!s_stack.empty()) {
-            set<int> found = transition(s_stack.top(),'$');
+    set<int> lock {state};
+    stack<int> s_stack {};
+    s_stack.push(state);
+    while (!s_stack.empty()) {
+        set<int> found = transition(s_stack.top(),'$');
 
-            s_stack.pop();
-            for (auto &s: found) if (lock.find(s) == lock.end()) {
-                s_stack.push(s);
-                lock.insert(s);
-            }
+        s_stack.pop();
+        for (auto &s: found) if (lock.find(s) == lock.end()) {
+            s_stack.push(s);
+            lock.insert(s);
         }
-        
-        return lock;
     }
-
-    std::set<int> Automaton::e_closure(const std::set<int> &states) 
-    {
-        if (symbols.find('$') == symbols.end())
-            return {states};
-
-        using std::set;
-
-        set<int> lock {states};
-        for (auto &s: states) {
-            set<int> found = e_closure(s);
-            lock.merge(found);
-        }
-
-        return lock;    
-    }
-
-    std::set<int> Automaton::move(const std::set<int> &states, const char &c)
-    {
-        using std::set;
     
-        set<int> next {};
-        for (auto &s: states) {
-            set<int> found = transition(s,c);
-            next.merge(found);
-        }
+    return lock;
+}
 
-        return next;   
+std::set<int> Automaton::e_closure(const std::set<int> &states) 
+{
+    if (!symbols.contains('$'))
+        return {states};
+
+    using std::set;
+
+    set<int> lock {states};
+    for (auto &s: states) {
+        set<int> found = e_closure(s);
+        lock.merge(found);
     }
+
+    return lock;    
+}
+
+std::set<int> Automaton::move(const std::set<int> &states, const char &c)
+{
+    using std::set;
+
+    set<int> next {};
+    for (auto &s: states) {
+        set<int> found = transition(s,c);
+        next.merge(found);
+    }
+
+    return next;   
+}
 
 bool Automaton::simulate(std::string word)
 {
