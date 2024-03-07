@@ -99,8 +99,14 @@ namespace algorithms {
         for (size_t i = 0; i < exp_regex.size(); i++)
         {
             char ch = exp_regex[i];
-            if (ch == '\"' || ch == '\'') {
+            if (ch == '\"') {
                 literal = !literal;
+            }
+
+            if (ch == '\'') {
+                output.push_back(ch);
+                output.push_back(exp_regex[++i]);
+                ++i;
             }
 
             if (!literal && (ch == '(' || ch == ')'))
