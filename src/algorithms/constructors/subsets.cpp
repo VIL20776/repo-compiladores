@@ -17,11 +17,11 @@ namespace algorithms {
         using std::set, std::map, std::vector;
 
         const table transition_table = automaton->get_table();
-        const set<int> acceptance = automaton->get_acceptance();
+        const map<int,int> acceptance = automaton->get_acceptance();
 
         set<char> symbols = automaton->get_symbols();
         symbols.extract('$');
-        set<int> new_acceptance {};
+        map<int,int> new_acceptance {};
         table new_table {};
 
         vector<set<int>> found_states {};
@@ -50,7 +50,7 @@ namespace algorithms {
             }
             if (std::includes(marked_state.begin(), marked_state.end(),
             acceptance.begin(), acceptance.end())) 
-                new_acceptance.insert(mark);
+                new_acceptance.insert(mark, mark);
                 
             new_table.push_back(new_tran);
             mark++;

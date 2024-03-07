@@ -23,7 +23,7 @@ namespace algorithms {
             symbols.insert(iter->second);
         symbols.extract('#');
 
-        set<int> new_acceptance {};
+        map<int,int> new_acceptance {};
         table new_table {};
 
         vector<set<int>> found_states {};
@@ -62,8 +62,10 @@ namespace algorithms {
                 acceptance.begin(), acceptance.end(),
                 std::back_inserter(intersection)
             );
-            if (!intersection.empty()) 
-                new_acceptance.insert(mark);
+            if (!intersection.empty()) {
+                int id = intersection.at(0);
+                new_acceptance.insert({mark, id});
+            }
                 
             new_table.push_back(new_tran);
             mark++;

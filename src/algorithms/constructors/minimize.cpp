@@ -44,7 +44,10 @@ namespace algorithms {
     {
 
         // initial partition
-        std::set<int> acceptance = automaton->get_acceptance();
+        std::map<int,int> acceptance_map = automaton->get_acceptance();
+        std::set<int> acceptance {};
+        for (auto &a: acceptance_map)
+            acceptance.insert(a.first);
         std::set<int> non_acceptance {};
         for (size_t i = 0; i < automaton->get_size(); i++)
             if (acceptance.find(i) == acceptance.end())
@@ -106,7 +109,7 @@ namespace algorithms {
         }
 
         //find new acceptance states
-        set<int> new_acceptance {};
+        map<int,int> new_acceptance {};
         for (int i = 0; i < part.size(); i++)
         {
             set<int> state = part.at(i);
@@ -115,10 +118,10 @@ namespace algorithms {
                     acceptance.begin(), acceptance.end(),
                     state.begin(), state.end()
                 )
-            )   new_acceptance.insert(i);
+            )   new_acceptance.insert(i,i);
         }
 
         return  std::make_unique<models::Automaton>
-                (new_acceptance,automaton->get_symbols(), transition_table);
+                (new_acceptance, automaton->get_symbols(), transition_table);
     }
 }

@@ -159,7 +159,7 @@ namespace algorithms {
             dest_set->insert(t.destiny);
         }
 
-        return std::make_unique<models::Automaton>(set<int>({ states }), symbols, transition_table);
+        return std::make_unique<models::Automaton>(map<int,int>({ states, states }), symbols, transition_table);
     }
 
 

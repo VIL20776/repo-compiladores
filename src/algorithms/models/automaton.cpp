@@ -6,7 +6,7 @@ namespace models {
 
 
 Automaton::Automaton(
-    std::set<int> acceptance,
+    std::map<int,int> acceptance,
     std::set<char> symbols,
     std::vector<std::map<char, std::set<int>>> 
     transition_table)
@@ -20,7 +20,7 @@ Automaton::Automaton(
 }
 
 const int &Automaton::get_size() { return size; }
-const std::set<int> &Automaton::get_acceptance() { return acceptance; }
+const std::map<int,int> &Automaton::get_acceptance() { return acceptance; }
 const std::set<char> &Automaton::get_symbols() { return symbols; }
 const std::set<int> &Automaton::transition(int i, char c) { return transition_table.at(i).at(c); }
 const std::vector<std::map<char, std::set<int>>>
@@ -78,27 +78,32 @@ std::set<int> Automaton::move(const std::set<int> &states, const char &c)
     return next;   
 }
 
-bool Automaton::simulate(std::string word)
+std::set<int> Automaton::simulate(std::string word, bool deterministic)
 {
     using std::set, std::map;
     for (auto &c: word)
-        if (symbols.find(c) == symbols.end()) return false;
+        if (!symbols.contains(c)) return {};
 
-    set<int> states = e_closure(0);
+    set<int> states = deterministic ? 
+        set<int>({0}): 
+        e_closure(0);
     for (auto &c: word) {
         set<int> new_states = {};
         for (auto &s : states) {
-            set<int> found_states = e_closure(move(states, c));
+            set<int> found_states = deterministic ? 
+                move(states,c): 
+                e_closure(move(states, c));
             new_states.merge(found_states);
         }
-        if (new_states.empty()) return false;
+        if (new_states.empty()) return {};
         states = new_states;
     }
 
     for (auto &s: states)
-        if (acceptance.find(s) != acceptance.end()) return true;
+        if (acceptance.contains(s)) 
+        return {acceptance.at(s)};
     
-    return false;
+    return {};
 }
 
 
@@ -134,7 +139,7 @@ void Automaton::graph_automaton(char* name)
         char* node_name = std::to_string(i).data();
         Agnode_t *node = agnode(G, node_name, true);
         nodes.push_back(node);
-        if (acceptance.find(i) != acceptance.end()) 
+        if (acceptance.contains(i)) 
             agset(node, string("shape").data(), string("doublecircle").data());
     }
     
