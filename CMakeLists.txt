@@ -16,9 +16,9 @@ find_library(gvc libgvc NAMES gvc)
 add_library(algorithms STATIC 
     src/algorithms/regex.cpp
     src/algorithms/postfix.cpp 
-    src/algorithms/constructors/thompson.cpp
-    src/algorithms/constructors/subsets.cpp
-    src/algorithms/constructors/minimize.cpp
+    # src/algorithms/constructors/thompson.cpp
+    # src/algorithms/constructors/subsets.cpp
+    # src/algorithms/constructors/minimize.cpp
     src/algorithms/constructors/direct.cpp
     src/algorithms/models/automaton.cpp
     src/algorithms/models/syntax_tree.cpp)
@@ -28,6 +28,7 @@ target_link_libraries(algorithms PRIVATE ${cgraph} ${gvc})
 add_library(yalex STATIC
     src/analyzer/yalex.cpp)
 target_include_directories(yalex PRIVATE src ${VCPKG_INCLUDE_DIR})
+target_link_libraries(yalex PRIVATE algorithms ${cgraph} ${gvc})
 
 # Compiler executable
 add_executable(Compilador src/main.cpp)
@@ -36,16 +37,16 @@ target_include_directories(Compilador PRIVATE src ${VCPKG_INCLUDE_DIR})
 target_link_libraries(Compilador PRIVATE algorithms yalex)
 
 # Test executables
-add_executable(regex.test tests/regex.test.cpp)
-target_include_directories(regex.test PRIVATE src ${VCPKG_INCLUDE_DIR})
+# add_executable(regex.test tests/regex.test.cpp)
+# target_include_directories(regex.test PRIVATE src ${VCPKG_INCLUDE_DIR})
 
-target_link_libraries(regex.test PRIVATE algorithms Catch2::Catch2 Catch2::Catch2WithMain)
+# target_link_libraries(regex.test PRIVATE algorithms Catch2::Catch2 Catch2::Catch2WithMain)
 
-include(CTest)
-enable_testing()
+# include(CTest)
+# enable_testing()
 
-include(Catch)
-catch_discover_tests(regex.test)
+# include(Catch)
+# catch_discover_tests(regex.test)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

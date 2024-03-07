@@ -3,10 +3,33 @@
 #include "algorithms/algorithms.hpp"
 #include "analyzer/yalex.hpp"
 
+void simulation_mesage(std::set<int> result)
+{
+    if (result.empty())
+    {
+        std::cout << "The word is not accepted by the automaton" << std::endl;
+        return;
+    }
+    int acceptance = *result.begin();
+    std::cout << "The word is accepted by the automaton: Aceptance " << acceptance << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
-    std::string regex = "[^\'a\'-\'z\'\'A\'-\'Z\']";
-    std::string word = "let";
+    std::string regex = 
+        "\"let\"#" // let 4
+        "|\"rule\"#" // rule 9
+        "|\"(*\"#" //open comment 12
+        "|\"*)\"#" //close comment 15
+        "|'|'#" //entry_or 17
+        "|[\"\\t\\n\\s\"]#" //delim 21
+        "|'='#" // assign 23
+        "|['a'-'z''A'-'Z']+#" //ident 128
+        "|['!'-'~']+#" //regexp 379
+        "|{([\"\\t\\n\\s\"'a'-'z''A'-'Z'])+}#"; //action 638
+        ;
+
+    std::string word = "{ return WHITESPACE }";
 
     if (argc == 3)
     {
@@ -14,23 +37,24 @@ int main(int argc, char const *argv[])
         word = std::string(argv[2]);
     }
 
-    // analyzer::Yalex("./slr-1.yal");
+    auto yalex = analyzer::Yalex();
+    yalex.compile("slr-1.yal");
 
-    std::cout << regex << "\n";
-    regex = algorithms::to_standard(regex);
-    std::cout << regex << "\n";
-    std::string postfix = algorithms::regex_to_postfix(regex);
-    std::cout << postfix << "\n";
-
-    std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
-    // std::unique_ptr<models::Automaton> nfa {};
-    std::unique_ptr<models::Automaton> dfa {};
+    std::cout << "Regex: " << yalex.get_entrypoint() << std::endl;
 
 
-    fa_creator.reset(new algorithms::Direct(postfix));
-    dfa = fa_creator->create_automata();
-    // bool result1 = simulation_mesage(dfa->simulate(word));
-    dfa->graph_automaton(std::string("Direct.png").data());
+    // regex = algorithms::to_standard(regex);
+    // std::cout << "Regex: " << regex << std::endl;
+    // std::string postfix = algorithms::regex_to_postfix(regex);
+    // std::cout << "Postfix: " << postfix << std::endl;
+
+    // std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
+    // std::unique_ptr<models::Automaton> dfa {};
+
+    // fa_creator.reset(new algorithms::Direct(postfix));
+    // dfa = fa_creator->create_automata();
+    // simulation_mesage(dfa->simulate(word,true));
+    // dfa->graph_automaton(std::string("Direct.png").data());
 
     return 0;
 }
