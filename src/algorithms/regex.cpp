@@ -104,7 +104,7 @@ namespace algorithms {
         using std::string;
 
         string std_regex = {};
-        string substring = "";
+        string substring = {};
         for (int i = 0; i < regex.size(); i++)
         {
             char ch = regex.at(i);
@@ -139,7 +139,15 @@ namespace algorithms {
                 if (escape_chars.contains(ch)) {
                     std_regex.push_back(escape_chars.at(ch));
                 } else 
-                    std_regex.push_back(ch);
+                    std_regex.append(string("\'") + ch + "\'");
+                break;
+            case '_':
+                std_regex.push_back('(');
+                for (char i = 0; i >= 0; i++) {
+                    std_regex.append(string("\'") + i + "\'");
+                    if (i != 127) std_regex.push_back('|');
+                }
+                std_regex.push_back(')');
                 break;
             default:
                 std_regex.push_back(regex.at(i));
@@ -158,5 +166,4 @@ namespace algorithms {
         
         return replace_extentions(regex);
     }
-
-}
+} // namespace algorithms
