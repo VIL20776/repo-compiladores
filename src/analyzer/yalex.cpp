@@ -14,8 +14,8 @@ namespace analyzer {
         DELIM = 21,
         ASSIGN = 23,
         IDENT = 128,
-        REGEXP = 317,
-        ACTION = 430
+        REGEXP = 412,
+        ACTION = 525
     };
 
     std::string Yalex::replace_idents(const std::string &entrypoint)
@@ -45,8 +45,8 @@ namespace analyzer {
             "|[\"\\t\\n\\s\"]#" //delim 21
             "|'='#" // assign 23
             "|['a'-'z''A'-'Z']+#" //ident 128
-            "|[' '-'~']+#" //regexp 379
-            "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 638
+            "|['!'-'~']((\\s['!'-'~'])|['!'-'~'])*#" //regexp 317
+            "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
             ;
 
         yalex_tokens = algorithms::to_standard(yalex_tokens);
@@ -70,12 +70,14 @@ namespace analyzer {
         bool ignore = false;
         bool assign_ident = false;
         bool assign_entry = false;
+        int expected = 0;
         int error = 0;
 
         std::string token = "";
         std::string ident_key = "";
         std::string entry_key = "";
 
+        int acceptance = 0;
         int prev_acceptance = 0;
         while (!archivo.eof()) {
 
@@ -88,74 +90,39 @@ namespace analyzer {
             char ch = archivo.get();
             token.push_back(ch);
 
-            if (ignore && token.ends_with("*)")) {
-                token = ""; ignore = false;
+            if (token.starts_with("(*")) {
+                while (!token.ends_with("*)")) {
+                    ch = archivo.get();
+                    token.push_back(ch);
+                }
+                token = "";
                 continue;
             }
-
-            if (ignore) continue;
 
             std::set<int> result = dfa->simulate(token,true);
-            if (result.empty()) 
-                continue;
-            
-            std::string temp_token = token;
-            temp_token.push_back(archivo.peek());
-            std::set<int> temp_result = dfa->simulate(temp_token,true);
-
-            if (!temp_result.empty()) 
-                continue;
-
-            int acceptance = *result.begin();
-            switch (acceptance)
-            {
-            case LET:
-                assign_ident = true;
-                break;
-            case RULE:
-                assign_entry = true;
-                break;
-            case O_COMMENT:
-                ignore = true;
-                break;
-            case C_COMMENT:
-                ignore = false;
-                break;
-            case ENTRY_OR:
-                if (!(prev_acceptance == REGEXP))
-                    entrypoint.append("#" + token);
-                break;
-            case ASSIGN:
-                if (!(prev_acceptance == IDENT && (assign_ident || assign_entry)))
-                    error = 1;
-                break;
-            case IDENT:
-                if (assign_ident && !assign_entry) {
-                    idents[token] = "";
-                    ident_key = token;   
+            while (acceptance != expected || result.empty()) {
+                if (result.empty()) {
+                    if (acceptance == prev_acceptance) {
+                        error = 1;
+                        break;
+                    }
+                    prev_acceptance = acceptance;
+                    token.pop_back();
+                    result = dfa->simulate(token,true);
+                    continue;
                 }
-                if (assign_entry && !assign_ident)
-                    entry_key = token;
-                break;
-            case REGEXP:
-                if (assign_ident) {
-                    idents[ident_key] = token;
-                    assign_ident = false;
-                }
-
-                if (assign_entry)
-                    entrypoint.append(token);
-                break;
-            case ACTION:
-                // TODO: implement action
-                break;
+                prev_acceptance = acceptance;
+                token.push_back(archivo.get());
+                result = dfa->simulate(token,true);
+            }
             
-            default:
-                break;
+            
+            acceptance = *result.begin();
+            if (acceptance == DELIM) {
+                token = "";
+                continue;
             }
 
-            token = "";
-            prev_acceptance = acceptance != DELIM ? acceptance : prev_acceptance;
         }
 
         archivo.close();

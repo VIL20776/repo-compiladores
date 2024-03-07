@@ -16,26 +16,26 @@ void simulation_mesage(std::set<int> result)
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = 
-        "\"let\"#" // let 4
-        "|\"rule\"#" // rule 9
-        "|\"(*\"#" //open comment 12
-        "|\"*)\"#" //close comment 15
-        "|'|'#" //entry_or 17
-        "|[\"\\t\\n\\s\"]#" //delim 21
-        "|'='#" // assign 23
-        "|['a'-'z''A'-'Z']+#" //ident 128
-        "|['!'-'~']+#" //regexp 379
-        "|{([\"\\t\\n\\s\"'a'-'z''A'-'Z'])+}#"; //action 638
-        ;
+    // std::string regex = 
+    //         "\"let\"#" // let 4
+    //         "|\"rule\"#" // rule 9
+    //         "|\"(*\"#" //open comment 12
+    //         "|\"*)\"#" //close comment 15
+    //         "|'|'#" //entry_or 17
+    //         "|[\"\\t\\n\\s\"]#" //delim 21
+    //         "|'='#" // assign 23
+    //         "|['a'-'z''A'-'Z']+#" //ident 128
+    //         "|['!'-'~'](\\s['!'-'~']|['!'-'~'])*#" //regexp 317
+    //         "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
+    //     ;
 
-    std::string word = "{ return WHITESPACE }";
+    // std::string word = "a";
 
-    if (argc == 3)
-    {
-        regex = std::string(argv[1]);
-        word = std::string(argv[2]);
-    }
+    // if (argc == 3)
+    // {
+    //     regex = std::string(argv[1]);
+    //     word = std::string(argv[2]);
+    // }
 
     auto yalex = analyzer::Yalex();
     yalex.compile("slr-1.yal");
