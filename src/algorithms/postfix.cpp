@@ -31,7 +31,6 @@ namespace algorithms {
                 if (currentSymbol == '\'') {
                     result += regex[++i]; 
                     result += regex[++i];
-                    continue;
                 }
 
                 if (literal || currentSymbol == '(' || currentSymbol == '|')
@@ -100,23 +99,16 @@ namespace algorithms {
         for (size_t i = 0; i < exp_regex.size(); i++)
         {
             char ch = exp_regex[i];
-            if (ch == '(' || ch == ')')
+            if (ch == '\"' || ch == '\'') {
+                literal = !literal;
+            }
+
+            if (!literal && (ch == '(' || ch == ')'))
             {
                 handle_parentesis(ch, stack, output);   
                 continue;         
             }
-            if (ch == '\"') {
-                literal = !literal;
-                if (literal) continue;
-            }
 
-            if (ch == '\'') {
-                output.push_back(ch);
-                output.push_back(exp_regex[++i]); 
-                output.push_back(exp_regex[++i]);
-                continue;
-            }
-            
             if (literal || !precedence_map.contains(ch))
             {
                 output.push_back(ch);
