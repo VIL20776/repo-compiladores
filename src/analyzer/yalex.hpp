@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <memory>
 
 #include "algorithms/algorithms.hpp"
@@ -11,13 +12,15 @@ class Yalex
 {
 private:
     std::unique_ptr<models::Automaton> dfa;
+    std::map<std::string, std::string> idents;
+    std::string entrypoint;
 
-    void read(std::string filename);
+    std::string replace_idents(const std::string &entrypoint);
     
 public:
     Yalex();
-
-
+    const std::string &get_entrypoint();
+    int compile(std::string filename);
 };
 
 }
