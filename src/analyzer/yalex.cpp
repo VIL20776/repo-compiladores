@@ -22,7 +22,7 @@ namespace analyzer {
     std::string Yalex::replace_idents(const std::string &entrypoint)
     {
         std::string entry = entrypoint;
-        for (auto iter = idents.begin(); iter != idents.end(); ++iter) {
+        for (auto iter = idents.rbegin(); iter != idents.rend(); ++iter) {
             size_t pos = entry.find(iter->first);
             while (pos != std::string::npos) {
                 entry.replace(pos, iter->first.length(), iter->second);
