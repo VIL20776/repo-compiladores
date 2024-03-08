@@ -16,7 +16,7 @@ void simulation_mesage(std::set<int> result)
 
 int main(int argc, char const *argv[])
 {
-    std::string regex = 
+    // std::string regex = 
             // "\"let\"#" // let 4
             // "|\"rule\"#" // rule 9
             // "|'|'#" //entry_or 17
@@ -25,10 +25,10 @@ int main(int argc, char const *argv[])
             // "|['a'-'z''A'-'Z']+#" //ident 128
             // "|(' '|['!'-'~'])+#" //regexp 317
             // "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
-            "\"(*\"(_)*\"*)\"#" //comment
+            // "|\"(*\"(_)*\"*)\"#" //comment
         ;
 
-    std::string word = "(* Lexer para Gramática No. 1 - Expresiones aritméticas simples para variables *)";
+    // std::string word = "(* Lexer para Gramática No. 1 - Expresiones aritméticas simples para variables *)";
 
     // if (argc == 3)
     // {
@@ -36,24 +36,24 @@ int main(int argc, char const *argv[])
     //     word = std::string(argv[2]);
     // }
 
-    // auto yalex = analyzer::Yalex();
-    // yalex.compile("slr-1.yal");
+    auto yalex = analyzer::Yalex();
+    yalex.compile("slr-1.yal");
 
-    // std::cout << "Regex: " << yalex.get_entrypoint() << std::endl;
+    std::cout << "Regex: " << yalex.get_entrypoint() << std::endl;
 
 
-    regex = algorithms::to_standard(regex);
-    // std::cout << "Regex: " << regex << std::endl;
-    std::string postfix = algorithms::regex_to_postfix(regex);
-    std::cout << "Postfix: " << postfix << std::endl;
+    // regex = algorithms::to_standard(regex);
+    // // std::cout << "Regex: " << regex << std::endl;
+    // std::string postfix = algorithms::regex_to_postfix(regex);
+    // // std::cout << "Postfix: " << postfix << std::endl;
 
-    std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
-    std::unique_ptr<models::Automaton> dfa {};
+    // std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
+    // std::unique_ptr<models::Automaton> dfa {};
 
-    fa_creator.reset(new algorithms::Direct(postfix));
-    dfa = fa_creator->create_automata();
-    simulation_mesage(dfa->simulate(word,true));
-    dfa->graph_automaton(std::string("Direct.png").data());
+    // fa_creator.reset(new algorithms::Direct(postfix));
+    // dfa = fa_creator->create_automata();
+    // simulation_mesage(dfa->simulate(word,true));
+    // dfa->graph_automaton(std::string("Direct.png").data());
 
     return 0;
 }

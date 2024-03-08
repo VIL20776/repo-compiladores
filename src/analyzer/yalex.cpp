@@ -1,5 +1,6 @@
 #include "yalex.hpp"
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 
@@ -9,12 +10,13 @@ namespace analyzer {
         LET = 4,
         RULE = 9,
         ENTRY_OR = 11,
-        DELIM = 15,
-        ASSIGN = 17,
-        IDENT = 122,
-        REGEXP = 314,
-        ACTION = 427,
-        COMMENT = 560
+        O_COMMENT = 14,
+        C_COMMENT = 17,
+        DELIM = 21,
+        ASSIGN = 23,
+        IDENT = 128,
+        REGEXP = 323,
+        ACTION = 436,
     };
 
     std::string Yalex::replace_idents(const std::string &entrypoint)
@@ -39,12 +41,13 @@ namespace analyzer {
             "\"let\"#" // let 4
             "|\"rule\"#" // rule 9
             "|'|'#" //entry_or 17
+            "|\"(*\"#" //comment open
+            "|\"*)\"#" //comment close
             "|[\"\\t\\n\\s\"]#" //delim 21
             "|'='#" // assign 23
             "|['a'-'z''A'-'Z']+#" //ident 128
-            "|(' '|['!'-'~'])+\\n#" //regexp 317
+            "|(\"' '\"|['!'-'~'])+#" //regexp 317
             "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
-            "|\"(*\"(_)*\"*)\"#" //comment
             ;
 
         yalex_tokens = algorithms::to_standard(yalex_tokens);
@@ -75,45 +78,60 @@ namespace analyzer {
         
         archivo.close();
 
-        set<int> expected = {LET,RULE,DELIM,COMMENT};
+        set<int> expected = {LET,RULE,DELIM,O_COMMENT};
 
         string token = "";
         string ident_key = "";
 
         int acceptance = 0;
 
+        int offset = 0;
         int npos = 0;
-        int buf_len = buffer.size(); 
-        while (buf_len > npos) {
-            for (size_t i = npos; i < buf_len; i++) {
-                token.push_back(buffer.at(i));
+        while (buffer.size() > offset) {
+            for (size_t i = offset; i < buffer.size(); i++) {
+                char ch = std::abs(buffer.at(i));
+                token.push_back(ch);
                 set<int> result = dfa->simulate(token,true);
                 if (result.empty()) 
                     continue;
 
-                npos = i;
+                npos = i - offset + 1;
                 acceptance = *result.begin();
             }
 
-            npos++;
 
-            if (!(acceptance == DELIM || acceptance == COMMENT))
-                expected.clear();
+            if (expected.contains(C_COMMENT)) {
+                if (acceptance == C_COMMENT) {
+                    auto it = expected.find(C_COMMENT);
+                    expected.erase(it);
+                }
+                token = "";
+                offset += npos;
+                continue;
+            }
+            
+            if (assign_entry && !expected.contains(IDENT) && acceptance == IDENT) 
+                acceptance = REGEXP;               
+ 
+            if (!(acceptance == DELIM || acceptance == O_COMMENT))
+                expected.clear();   
 
-            token = buffer.substr(0,npos);
+            token = buffer.substr(offset,npos);
             token.shrink_to_fit();
+            offset += npos;
 
             switch (acceptance)
             {
             case LET:
-                expected.insert({IDENT, DELIM, COMMENT});
+                expected.insert({IDENT, DELIM, O_COMMENT});
                 assign_ident = true;
                 break;
             case RULE:
-                expected.insert({IDENT, DELIM, COMMENT});
+                expected.insert({IDENT, DELIM, O_COMMENT});
                 assign_entry = true;
+                break;
             case IDENT:
-                expected.insert({ASSIGN, DELIM, COMMENT});
+                expected.insert({ASSIGN, DELIM, O_COMMENT});
                 if (assign_ident) {
                     ident_key = token;
                     idents[ident_key] = "";
@@ -122,25 +140,27 @@ namespace analyzer {
                     entry_key = token;
                 break;
             case ASSIGN:
-                expected.insert({REGEXP, DELIM, COMMENT});
+                expected.insert({REGEXP, DELIM, O_COMMENT});
                 break;
             case REGEXP:
                 if (assign_ident) {
-                    expected.insert({LET, RULE, DELIM, COMMENT});
+                    expected.insert({LET, RULE, DELIM, O_COMMENT});
                     idents[ident_key] = token;
                     assign_ident = false;
                 }
 
                 if (assign_entry) {
-                    expected.insert({ENTRY_OR, DELIM, ACTION, COMMENT});
+                    expected.insert({ENTRY_OR, DELIM, ACTION, O_COMMENT});
                     entrypoint.append(token);
                 }
                 break;
             case ENTRY_OR:
-                expected.insert({REGEXP, DELIM, COMMENT});
-                entrypoint.append(string("#|") + token);
+                expected.insert({REGEXP, DELIM, O_COMMENT});
+                entrypoint.append(string("#|"));
                 break;
-            case COMMENT:
+            case O_COMMENT:
+                expected.insert(C_COMMENT);
+                break;
             case DELIM:
                 break;
             case ACTION:
@@ -157,7 +177,7 @@ namespace analyzer {
         return 0;
     }
 
-    const std::string &Yalex::get_entrypoint(){
+    const std::string &Yalex::get_entrypoint() {
         return entrypoint;
     }
     
