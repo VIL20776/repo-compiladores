@@ -8,14 +8,13 @@ namespace analyzer {
     enum Token {
         LET = 4,
         RULE = 9,
-        O_COMMENT = 12,
-        C_COMMENT = 15,
-        ENTRY_OR = 17,
-        DELIM = 21,
-        ASSIGN = 23,
-        IDENT = 128,
-        REGEXP = 412,
-        ACTION = 525
+        ENTRY_OR = 11,
+        DELIM = 15,
+        ASSIGN = 17,
+        IDENT = 122,
+        REGEXP = 314,
+        ACTION = 427,
+        COMMENT = 560
     };
 
     std::string Yalex::replace_idents(const std::string &entrypoint)
@@ -39,14 +38,13 @@ namespace analyzer {
         std::string yalex_tokens =  
             "\"let\"#" // let 4
             "|\"rule\"#" // rule 9
-            "|\"(*\"#" //open comment 12
-            "|\"*)\"#" //close comment 15
             "|'|'#" //entry_or 17
             "|[\"\\t\\n\\s\"]#" //delim 21
             "|'='#" // assign 23
             "|['a'-'z''A'-'Z']+#" //ident 128
-            "|['!'-'~']((\\s['!'-'~'])|['!'-'~'])*#" //regexp 317
+            "|(' '|['!'-'~'])+\\n#" //regexp 317
             "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
+            "|\"(*\"(_)*\"*)\"#" //comment
             ;
 
         yalex_tokens = algorithms::to_standard(yalex_tokens);
@@ -59,6 +57,7 @@ namespace analyzer {
     
     int Yalex::compile(std::string filename)
     {
+        using std::string, std::set;
         std::ifstream archivo(filename, std::ios::in);
 
         if (!archivo.is_open()) {
@@ -67,66 +66,93 @@ namespace analyzer {
         }
 
         // flags
-        bool ignore = false;
         bool assign_ident = false;
         bool assign_entry = false;
-        int expected = 0;
-        int error = 0;
-
-        std::string token = "";
-        std::string ident_key = "";
-        std::string entry_key = "";
-
-        int acceptance = 0;
-        int prev_acceptance = 0;
-        while (!archivo.eof()) {
-
-            if (error) {
-                std::cerr << "Error sintactico: " << token << std::endl;
-                archivo.close();
-                return error;
-            }
-
-            char ch = archivo.get();
-            token.push_back(ch);
-
-            if (token.starts_with("(*")) {
-                while (!token.ends_with("*)")) {
-                    ch = archivo.get();
-                    token.push_back(ch);
-                }
-                token = "";
-                continue;
-            }
-
-            std::set<int> result = dfa->simulate(token,true);
-            while (acceptance != expected || result.empty()) {
-                if (result.empty()) {
-                    if (acceptance == prev_acceptance) {
-                        error = 1;
-                        break;
-                    }
-                    prev_acceptance = acceptance;
-                    token.pop_back();
-                    result = dfa->simulate(token,true);
-                    continue;
-                }
-                prev_acceptance = acceptance;
-                token.push_back(archivo.get());
-                result = dfa->simulate(token,true);
-            }
-            
-            
-            acceptance = *result.begin();
-            if (acceptance == DELIM) {
-                token = "";
-                continue;
-            }
-
-        }
-
+        
+        string buffer = "";
+        while (!archivo.eof()) 
+            buffer.push_back(archivo.get());
+        
         archivo.close();
 
+        set<int> expected = {LET,RULE,DELIM,COMMENT};
+
+        string token = "";
+        string ident_key = "";
+
+        int acceptance = 0;
+
+        int npos = 0;
+        int buf_len = buffer.size(); 
+        while (buf_len > npos) {
+            for (size_t i = npos; i < buf_len; i++) {
+                token.push_back(buffer.at(i));
+                set<int> result = dfa->simulate(token,true);
+                if (result.empty()) 
+                    continue;
+
+                npos = i;
+                acceptance = *result.begin();
+            }
+
+            npos++;
+
+            if (!(acceptance == DELIM || acceptance == COMMENT))
+                expected.clear();
+
+            token = buffer.substr(0,npos);
+            token.shrink_to_fit();
+
+            switch (acceptance)
+            {
+            case LET:
+                expected.insert({IDENT, DELIM, COMMENT});
+                assign_ident = true;
+                break;
+            case RULE:
+                expected.insert({IDENT, DELIM, COMMENT});
+                assign_entry = true;
+            case IDENT:
+                expected.insert({ASSIGN, DELIM, COMMENT});
+                if (assign_ident) {
+                    ident_key = token;
+                    idents[ident_key] = "";
+                }
+                if (assign_entry) 
+                    entry_key = token;
+                break;
+            case ASSIGN:
+                expected.insert({REGEXP, DELIM, COMMENT});
+                break;
+            case REGEXP:
+                if (assign_ident) {
+                    expected.insert({LET, RULE, DELIM, COMMENT});
+                    idents[ident_key] = token;
+                    assign_ident = false;
+                }
+
+                if (assign_entry) {
+                    expected.insert({ENTRY_OR, DELIM, ACTION, COMMENT});
+                    entrypoint.append(token);
+                }
+                break;
+            case ENTRY_OR:
+                expected.insert({REGEXP, DELIM, COMMENT});
+                entrypoint.append(string("#|") + token);
+                break;
+            case COMMENT:
+            case DELIM:
+                break;
+            case ACTION:
+                // TODO
+                break;
+            default:
+                break;
+            }
+            
+            token = "";
+        }
+        
         entrypoint = replace_idents(entrypoint);
         return 0;
     }
