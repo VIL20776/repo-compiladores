@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAUKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-project(Compilador VERSION 0.1.1 LANGUAGES C CXX)
+project(Compilador VERSION 0.1.2 LANGUAGES C CXX)
 
 # Dependencies
 find_package(Catch2 CONFIG)

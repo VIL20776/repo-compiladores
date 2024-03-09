@@ -315,6 +315,9 @@ namespace models {
         {
             S_tree::node* currentNode = nodeQueue.front();
             nodeQueue.pop();
+            // if (non_printable.contains(currentNode->right->value)) {
+                
+            // }
             Agnode_t* agNode = nodeMap.at(currentNode);
 
             if (currentNode->left != nullptr)
