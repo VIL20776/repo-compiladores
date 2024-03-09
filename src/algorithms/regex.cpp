@@ -47,10 +47,20 @@ namespace algorithms {
         return substring;
     }
 
-    std::string replace_char_class (const std::string &char_class)
-    {
-        using std::string;
-        std::set<char> char_set= {};
+    std::set<char> char_set_diff(const std::set<char> &char_set1, const std::set<char> &char_set2) {
+        std::set<char> diff_set = {};
+
+        std::set_difference(
+            char_set1.begin(), char_set1.end(),
+            char_set2.begin(), char_set2.end(),
+            std::inserter(diff_set, diff_set.begin())
+        );
+
+        return diff_set;
+    }
+
+    std::set<char> create_char_set(const std::string &char_class) {
+        std::set<char> char_set = {};
         bool range = false;
         char start = 0; 
         // find chars in set
@@ -86,23 +96,28 @@ namespace algorithms {
                 break;
             }
         }
-        
-        string expression = "";
 
         if (inverse) {
-            for (char i = 0; i >= 0; i++)
-            if (!char_set.contains(i)) {
-                expression.append(string("\'") + i + "\'");
-                if (i != 127) expression.push_back('|');
+            std::set<char> all_chars = {};
+            for (char i = 0; i >= 0; i++) {
+                all_chars.insert(i);
             }
+            char_set = char_set_diff(all_chars, char_set);
         }
-        else {
-            for (auto it = char_set.begin(); it != char_set.end(); it++) {
-                expression.append(string("\'") + *it + "\'");
-                if (*it != *char_set.rbegin()) expression.push_back('|');
-            }
+
+        return char_set;
+    }
+
+    std::string replace_char_class (const std::set<char> &char_set)
+    {
+        using std::string;
+        string expression = "";
+
+        for (auto it = char_set.begin(); it != char_set.end(); it++) {
+            expression.append(string("\'") + *it + "\'");
+            if (*it != *char_set.rbegin()) expression.push_back('|');
         }
-        
+            
         return expression;
     }
 
@@ -113,6 +128,8 @@ namespace algorithms {
         string std_regex = {};
         string substring = {};
 
+        std::set<char> char_set = {};
+        bool difference = false;
         bool literal = false;
         for (int i = 0; i < regex.size(); i++)
         {
@@ -144,10 +161,22 @@ namespace algorithms {
                     std_regex.append(string("($|") + regex.at(i - 1) + ")");
                 }
                 break;
+            case '#':
+                difference = true;
+                extract_substring(std_regex, std_regex.size() - 1, {'(',')'});
+                break;
             case ']':
                 std_regex += ']';
                 substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'}, true);
-                std_regex.append(string("(") + replace_char_class(substring) + ")");
+                if (difference) {
+                    std::set<char> diff_set = char_set_diff(char_set, create_char_set(substring));
+                    std_regex.append(string("(") + replace_char_class(diff_set) + ")");
+                    difference = false;
+                } else {
+                    char_set = create_char_set(substring);
+                    std_regex.append(string("(") + replace_char_class(char_set) + ")");
+                }
+                
                 break;
             case '\"':
                 literal = !literal;
