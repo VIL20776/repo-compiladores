@@ -56,6 +56,7 @@ namespace models {
             if (literal && !(c == '\"')) {
                 nodes.push(new node(c, position));
                 values.insert({position, c});
+                symbols.insert(c);
                 position++;
                 if (concat) {
                     node *root = new node();
@@ -93,6 +94,7 @@ namespace models {
                 c = regex.at(++i);
                 nodes.push(new node(c, position));
                 values.insert({position, c});
+                symbols.insert(c);
                 position++; i++;
                 break;
             case '\"':
@@ -102,8 +104,10 @@ namespace models {
             default:
                 delete root;
                 nodes.push(new node(c, position));
-                if (c == '#') 
+                if (c == '\x80') 
                     sharp_pos.insert(position);
+                else
+                    symbols.insert(c);
 
                 values.insert({position, c});
                 position++;
@@ -271,7 +275,7 @@ namespace models {
     }
 
     const std::map<int,char> &S_tree::get_values() { return values; }
-
+    const std::set<char> &S_tree::get_symbols() { return symbols; }
     std::set<int> S_tree::sharp() { return sharp_pos; }
 
     void S_tree::draw_syntax_tree(std::string name)

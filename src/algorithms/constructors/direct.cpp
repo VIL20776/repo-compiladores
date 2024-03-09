@@ -8,7 +8,7 @@
 namespace algorithms {
 
     Direct::Direct(std::string expression): 
-        tree(expression + "#&") {};
+        tree(expression + "\x80&") {};
 
     std::unique_ptr<models::Automaton> Direct::create_automata ()
     {
@@ -17,10 +17,8 @@ namespace algorithms {
 
         set<int> acceptance = tree.sharp();
 
-        set<char> symbols {};
+        set<char> symbols = tree.get_symbols();
         map<int,char> value_map = tree.get_values();
-        for (auto iter = value_map.begin(); iter != value_map.end(); ++iter)
-            symbols.insert(iter->second);
 
         map<int,int> new_acceptance {};
         table new_table {};

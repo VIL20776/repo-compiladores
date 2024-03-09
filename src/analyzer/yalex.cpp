@@ -39,16 +39,16 @@ namespace analyzer {
     Yalex::Yalex()
     {
         std::string yalex_tokens =  
-            "\"let\"#" // let 4
-            "|\"rule\"#" // rule 9
-            "|'|'#" //entry_or 17
-            "|\"(*\"#" //comment open
-            "|\"*)\"#" //comment close
-            "|[\"\\t\\n\\s\"]#" //delim 21
-            "|'='#" // assign 23
-            "|['a'-'z''A'-'Z']+#" //ident 128
-            "|(\"' '\"|['!'-'~'])+#" //regexp 317
-            "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}#" //action 430
+            "\"let\"\x80" // let 4
+            "|\"rule\"\x80" // rule 9
+            "|'|'\x80" //entry_or 17
+            "|\"(*\"\x80" //comment open
+            "|\"*)\"\x80" //comment close
+            "|[\"\\t\\n\\s\"]\x80" //delim 21
+            "|'='\x80" // assign 23
+            "|['a'-'z''A'-'Z']+\x80" //ident 128
+            "|(\"' '\"|['!'-'~'])+\x80" //regexp 317
+            "|{[\"\\t\\n\\s\"'a'-'z''A'-'Z']+}\x80" //action 430
             ;
 
         yalex_tokens = algorithms::to_standard(yalex_tokens);
@@ -157,7 +157,7 @@ namespace analyzer {
                 break;
             case ENTRY_OR:
                 expected.insert({REGEXP, DELIM, O_COMMENT});
-                entrypoint.append(string("#|"));
+                entrypoint.append(string("\x80|"));
                 break;
             case O_COMMENT:
                 expected.insert(C_COMMENT);

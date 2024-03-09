@@ -26,6 +26,7 @@ namespace models {
     private:
         node *root;
         std::map<int, char> values;
+        std::set<char> symbols;
         std::set<int> sharp_pos;
 
         node *const find_node(node *node, int i);
@@ -42,6 +43,7 @@ namespace models {
         std::set<int> first_pos();
         std::set<int> follow_pos(int i);
         const std::map<int,char> &get_values();
+        const std::set<char> &get_symbols();
         std::set<int> sharp();
 
         void draw_syntax_tree (std::string name);

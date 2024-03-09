@@ -68,6 +68,7 @@ namespace algorithms {
                     char_set.insert(escape_chars.at(c));
                 } else 
                     char_set.insert(c);
+                break;
             case '-':
                 range = true;
                 break;
