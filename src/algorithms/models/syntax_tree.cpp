@@ -102,10 +102,10 @@ namespace models {
             default:
                 delete root;
                 nodes.push(new node(c, position));
-                values.insert({position, c});
                 if (c == '#') 
                     sharp_pos.insert(position);
 
+                values.insert({position, c});
                 position++;
                 break;
             }
@@ -319,7 +319,7 @@ namespace models {
                 nodeQueue.push(leftNode);
                 nodeMap[leftNode] = agnode(G, nullptr, true);
                 std::string label;
-                if (leftNode->value == '\n' && leftNode->position == 0)
+                if (sharp_pos.contains(leftNode->position))
                     label = "Accept";
                 else
                     label = (non_printable.contains(leftNode->value)) ?
@@ -337,7 +337,7 @@ namespace models {
                 std::string label = (non_printable.contains(rightNode->value)) ?
                     non_printable.at(rightNode->value): 
                     string(1, rightNode->value);
-                if (rightNode->value == '\n' && rightNode->position == 0)
+                if (sharp_pos.contains(rightNode->position))
                     label = "Accept";
                 agset(nodeMap.at(rightNode), string("label").data(), label.data());
                 Agedge_t* edge = agedge(G, agNode, nodeMap.at(rightNode), nullptr, true);
