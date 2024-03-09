@@ -7,6 +7,12 @@
 
 namespace algorithms {
 
+    const std::map<char,char> escape_chars = {
+        {'t','\t'},
+        {'n','\n'},
+        {'s',' '}
+    };
+
     int check_char_pairs(const std::string& str, std::array<char,2> pair) {
         int count_open = std::count(str.begin(), str.end(), pair[0]);
         int count_close = std::count(str.begin(), str.end(), pair[1]);
@@ -46,7 +52,7 @@ namespace algorithms {
         using std::string;
         std::set<char> char_set= {};
         bool range = false;
-        char start = '\0';
+        char start = 0; 
         // find chars in set
         bool inverse = char_class.starts_with('^');
         for (size_t i = inverse; i < char_class.size(); i++) {
@@ -56,6 +62,12 @@ namespace algorithms {
             case '\'':
             case '\"':
                 break;
+            case '\\':
+                c = char_class.at(++i);
+                if (escape_chars.contains(c)) {
+                    char_set.insert(escape_chars.at(c));
+                } else 
+                    char_set.insert(c);
             case '-':
                 range = true;
                 break;
@@ -93,21 +105,23 @@ namespace algorithms {
         return expression;
     }
 
-    const std::map<char,char> escape_chars = {
-        {'t','\t'},
-        {'n','\n'},
-        {'s',' '}
-    };
-
     std::string replace_extentions (const std::string &regex)
     {
         using std::string;
 
         string std_regex = {};
         string substring = {};
+
+        bool literal = false;
         for (int i = 0; i < regex.size(); i++)
         {
             char ch = regex.at(i);
+
+            if (literal && ch != '\"'){
+                std_regex.push_back(ch);
+                continue;
+            }
+
             switch (ch)
             {
             case '+':
@@ -134,12 +148,24 @@ namespace algorithms {
                 substring = extract_substring(std_regex, std_regex.size() - 1, {'[',']'}, true);
                 std_regex.append(string("(") + replace_char_class(substring) + ")");
                 break;
+            case '\"':
+                literal = !literal;
+                std_regex.push_back(ch);
+                break;
+            case '\'':
+                ch = regex.at(++i);
+                if (ch != '\\') {
+                    std_regex.append(string("\'") + ch + "\'");
+                    i++;
+                    break;
+                } 
             case '\\':
                 ch = regex.at(++i);
                 if (escape_chars.contains(ch)) {
-                    std_regex.push_back(escape_chars.at(ch));
+                    std_regex.append(string("\'") + escape_chars.at(ch) + "\'");
                 } else 
                     std_regex.append(string("\'") + ch + "\'");
+                i++;
                 break;
             case '_':
                 std_regex.push_back('(');
@@ -150,7 +176,7 @@ namespace algorithms {
                 std_regex.push_back(')');
                 break;
             default:
-                std_regex.push_back(regex.at(i));
+                std_regex.push_back(ch);
                 break;
             }
         }
