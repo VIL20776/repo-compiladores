@@ -1,7 +1,12 @@
 #include "syntax_tree.hpp"
 
+#include <graphviz/cgraph.h>
+#include <graphviz/gvc.h>
+
 #include <string>
+#include <vector>
 #include <stack>
+#include <queue>
 #include <map>
 
 namespace models {
@@ -268,4 +273,81 @@ namespace models {
     const std::map<int,char> &S_tree::get_values() { return values; }
 
     std::set<int> S_tree::sharp() { return sharp_pos; }
+
+    void S_tree::draw_syntax_tree(std::string name)
+    {
+        using std::string;
+        const std::map<char, std::string> non_printable = {
+            {0, "NUL"},  {1, "SOH"},  {2, "STX"},  {3, "ETX"},
+            {4, "EOT"},  {5, "ENQ"},  {6, "ACK"},  {7, "BEL"},
+            {8, "BS"},   {9, "HT"},   {10, "LF"},  {11, "VT"},
+            {12, "FF"},  {13, "CR"},  {14, "SO"},  {15, "SI"},
+            {16, "DLE"}, {17, "DC1"}, {18, "DC2"}, {19, "DC3"},
+            {20, "DC4"}, {21, "NAK"}, {22, "SYN"}, {23, "ETB"},
+            {24, "CAN"}, {25, "EM"},  {26, "SUB"}, {27, "ESC"},
+            {28, "FS"},  {29, "GS"},  {30, "RS"},  {31, "US"},
+            {32, "(space)"}, {127, "DEL"}
+        };
+
+        Agraph_t* G;
+        GVC_t* gvc;
+
+        gvc = gvContext();
+        G = agopen(name.data(), Agdirected, 0);
+
+        agattr(G, AGNODE, string("shape").data(), string("circle").data());
+
+        std::queue<S_tree::node*> nodeQueue;
+        std::map<S_tree::node*, Agnode_t*> nodeMap;
+
+        nodeQueue.push(root);
+        nodeMap[root] = agnode(G, nullptr, true);
+        std::string label = (non_printable.contains(root->value)) ?
+            non_printable.at(root->value): 
+            string(1, root->value);
+        agset(nodeMap.at(root), string("label").data(), label.data());
+
+        while (!nodeQueue.empty())
+        {
+            S_tree::node* currentNode = nodeQueue.front();
+            nodeQueue.pop();
+            Agnode_t* agNode = nodeMap.at(currentNode);
+
+            if (currentNode->left != nullptr)
+            {
+                S_tree::node* leftNode = currentNode->left;
+                nodeQueue.push(leftNode);
+                nodeMap[leftNode] = agnode(G, nullptr, true);
+                std::string label;
+                if (leftNode->value == '\n' && leftNode->position == 0)
+                    label = "Accept";
+                else
+                    label = (non_printable.contains(leftNode->value)) ?
+                        non_printable.at(leftNode->value): 
+                        string(1, leftNode->value);
+                agset(nodeMap.at(leftNode), string("label").data(), label.data());
+                Agedge_t* edge = agedge(G, agNode, nodeMap.at(leftNode), nullptr, true);
+            }
+
+            if (currentNode->right != nullptr)
+            {
+                S_tree::node* rightNode = currentNode->right;
+                nodeQueue.push(rightNode);
+                nodeMap[rightNode] = agnode(G, nullptr, true);
+                std::string label = (non_printable.contains(rightNode->value)) ?
+                    non_printable.at(rightNode->value): 
+                    string(1, rightNode->value);
+                if (rightNode->value == '\n' && rightNode->position == 0)
+                    label = "Accept";
+                agset(nodeMap.at(rightNode), string("label").data(), label.data());
+                Agedge_t* edge = agedge(G, agNode, nodeMap.at(rightNode), nullptr, true);
+            }
+        }
+
+        gvLayout(gvc, G, "dot");
+        gvRenderFilename(gvc, G, "png", name.data());
+        gvFreeLayout(gvc, G);
+        gvFreeContext(gvc);
+        agclose(G);
+    }
 }

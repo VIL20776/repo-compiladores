@@ -43,6 +43,8 @@ namespace models {
         std::set<int> follow_pos(int i);
         const std::map<int,char> &get_values();
         std::set<int> sharp();
+
+        void draw_syntax_tree (std::string name);
     };
 
 }
