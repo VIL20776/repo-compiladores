@@ -42,10 +42,15 @@ int main(int argc, char const *argv[])
     std::cout << "Regex: " << yalex.get_entrypoint() << std::endl;
 
 
-    // regex = algorithms::to_standard(regex);
-    // // std::cout << "Regex: " << regex << std::endl;
-    // std::string postfix = algorithms::regex_to_postfix(regex);
-    // // std::cout << "Postfix: " << postfix << std::endl;
+    std::string regex = yalex.get_entrypoint();
+    regex = algorithms::to_standard(regex + "#");
+    // std::cout << "Regex: " << regex << std::endl;
+    std::string postfix = algorithms::regex_to_postfix(regex);
+    // std::cout << "Postfix: " << postfix << std::endl;
+
+    postfix.append("#&");
+    models::Syntax_tree tree = models::Syntax_tree(postfix);
+    tree.draw_syntax_tree("Syntax_tree.png");
 
     // std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
     // std::unique_ptr<models::Automaton> dfa {};
