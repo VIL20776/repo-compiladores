@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "algorithms/algorithms.hpp"
+#include "models/syntax_tree.hpp"
 #include "analyzer/yalex.hpp"
 
 void simulation_mesage(std::set<int> result)

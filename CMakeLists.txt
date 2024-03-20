@@ -12,6 +12,13 @@ find_path(VCPKG_INCLUDE_DIR graphviz PATHS ${CMAKE_CURRENT_BINARY_DIR} REQUIRED)
 find_library(cgraph libcgraph NAMES cgraph REQUIRED)
 find_library(gvc libgvc NAMES gvc)
 
+add_library(models STATIC
+    src/models/automaton.cpp
+    src/models/syntax_tree.cpp
+)
+target_include_directories(models PRIVATE src ${VCPKG_INCLUDE_DIR})
+target_link_libraries(models PRIVATE ${cgraph} ${gvc})
+
 # Algoritms sources
 add_library(algorithms STATIC 
     src/algorithms/regex.cpp
@@ -19,22 +26,21 @@ add_library(algorithms STATIC
     # src/algorithms/constructors/thompson.cpp
     # src/algorithms/constructors/subsets.cpp
     # src/algorithms/constructors/minimize.cpp
-    src/algorithms/constructors/direct.cpp
-    src/algorithms/models/automaton.cpp
-    src/algorithms/models/syntax_tree.cpp)
+    src/algorithms/direct.cpp
+)
 target_include_directories(algorithms PRIVATE src ${VCPKG_INCLUDE_DIR})
-target_link_libraries(algorithms PRIVATE ${cgraph} ${gvc})
+target_link_libraries(algorithms PRIVATE models ${cgraph} ${gvc})
 
 add_library(yalex STATIC
     src/analyzer/yalex.cpp)
 target_include_directories(yalex PRIVATE src ${VCPKG_INCLUDE_DIR})
-target_link_libraries(yalex PRIVATE algorithms ${cgraph} ${gvc})
+target_link_libraries(yalex PRIVATE models algorithms ${cgraph} ${gvc})
 
 # Compiler executable
 add_executable(Compilador src/main.cpp)
 target_include_directories(Compilador PRIVATE src ${VCPKG_INCLUDE_DIR})
 
-target_link_libraries(Compilador PRIVATE algorithms yalex)
+target_link_libraries(Compilador PRIVATE models algorithms yalex)
 
 # Test executables
 # add_executable(regex.test tests/regex.test.cpp)

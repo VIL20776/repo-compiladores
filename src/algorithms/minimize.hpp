@@ -1,6 +1,6 @@
 #pragma once
 
-#include "algorithms/models/automaton.hpp"
+#include "models/automaton.hpp"
 
 #include <string>
 #include <memory>

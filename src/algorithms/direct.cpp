@@ -1,9 +1,9 @@
-#include "direct.hpp"
+#include "./direct.hpp"
 
 #include <algorithm>
 #include <iterator>
 
-#include "algorithms/models/syntax_tree.hpp"
+#include "models/syntax_tree.hpp"
 
 namespace algorithms {
 
