@@ -5,14 +5,14 @@
 
 namespace algorithms {
 
+    typedef std::vector<std::map<char, std::set<int>>> table;
+    using std::vector, std::map, std::set;
+
     struct transition
     {
         int origin, destiny;
         char symbol;
     };
-    
-    typedef std::vector<std::map<char, std::set<int>>> table;
-    using std::vector, std::map, std::set;
 
     vector<transition> kleene (const vector<transition> &deltas)
     {
@@ -121,12 +121,7 @@ namespace algorithms {
         return transitions.top();
     }
 
-    Thompson::Thompson(const std::string &expression)
-    {
-        this->expression = expression;
-    }
-
-    std::unique_ptr<models::Automaton> Thompson::create_automata()
+    std::unique_ptr<models::Automaton> regex_to_nfa(const std::string &expression)
     { 
         using std::vector;
         vector<transition> t_vector = list_transitions(expression);

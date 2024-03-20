@@ -1,19 +1,11 @@
 #pragma once
 
-#include "fa_factory.hpp"
+#include "algorithms/models/automaton.hpp"
 
 #include <string>
-
+#include <memory>
 
 namespace algorithms {
-    class Minimize : public AutomataCreator
-    {
-        models::Automaton *automaton;
-
-        std::vector<std::set<int>> new_partition (std::vector<std::set<int>> part);
-
-        public:
-        Minimize(models::Automaton *automaton);
-        std::unique_ptr<models::Automaton> create_automata (); 
-    };
+    std::unique_ptr<models::Automaton> 
+    minimize_dfa (models::Automaton *automaton); 
 }

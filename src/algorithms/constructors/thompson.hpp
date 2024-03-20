@@ -1,20 +1,14 @@
 # pragma once
 
-#include "fa_factory.hpp"
+#include "algorithms/models/automaton.hpp"
 
+#include <memory>
 #include <string>
 #include <map>
 #include <set>
 #include <vector>
 
 namespace algorithms {
-    class Thompson : public AutomataCreator
-    {
-    private:
-        std::string expression;
-    public:
-        Thompson(const std::string &expression);
-        std::unique_ptr<models::Automaton> create_automata();
-    };
-
+    std::unique_ptr<models::Automaton> 
+    regex_to_nfa(const std::string &expression);
 }

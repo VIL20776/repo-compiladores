@@ -6,12 +6,7 @@
 
 namespace algorithms {
 
-    Subsets::Subsets(models::Automaton *automaton)
-    {
-        this->automaton = automaton;
-    }
-
-    std::unique_ptr<models::Automaton> Subsets::create_automata ()
+    std::unique_ptr<models::Automaton> nfa_to_dfa (models::Automaton *automaton)
     {
         typedef std::vector<std::map<char, std::set<int>>> table;
         using std::set, std::map, std::vector;

@@ -53,10 +53,8 @@ namespace analyzer {
 
         yalex_tokens = algorithms::to_standard(yalex_tokens);
         yalex_tokens = algorithms::regex_to_postfix(yalex_tokens);
-        std::unique_ptr<algorithms::AutomataCreator> fa_creator {};
-        fa_creator.reset(new algorithms::Direct(yalex_tokens));
 
-        dfa = fa_creator->create_automata();
+        dfa = algorithms::regex_to_dfa(yalex_tokens);
     }
     
     int Yalex::compile(std::string filename)

@@ -7,13 +7,12 @@
 
 namespace algorithms {
 
-    Direct::Direct(std::string expression): 
-        tree(expression + "\x80&") {};
-
-    std::unique_ptr<models::Automaton> Direct::create_automata ()
+    std::unique_ptr<models::Automaton> regex_to_dfa (std::string expression)
     {
         typedef std::vector<std::map<char, std::set<int>>> table;
         using std::set, std::map, std::vector;
+
+        models::Syntax_tree tree (expression + "\x80&");
 
         set<int> acceptance = tree.sharp();
 

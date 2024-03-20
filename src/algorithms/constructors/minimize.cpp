@@ -9,7 +9,7 @@ namespace algorithms {
     using std::set, std::map;
 
 
-    partition Minimize::new_partition (partition part)
+    partition new_partition (partition part, models::Automaton *automaton)
     {
         partition new_part {};
         for (auto &group: part) {
@@ -34,13 +34,8 @@ namespace algorithms {
         return new_part;  
     }
 
-    Minimize::Minimize(models::Automaton *automaton)
-    {
-        this->automaton = automaton;
-    }
 
-
-    std::unique_ptr<models::Automaton> Minimize::create_automata()
+    std::unique_ptr<models::Automaton> minimize_dfa(models::Automaton *automaton)
     {
 
         // initial partition
@@ -59,7 +54,7 @@ namespace algorithms {
         while (part != temp_part)
         {
             part = temp_part;
-            temp_part = new_partition(part);
+            temp_part = new_partition(part, automaton);
         }
 
         //initialize transition table

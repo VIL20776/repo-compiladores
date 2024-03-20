@@ -1,18 +1,12 @@
 #pragma once
 
-#include "fa_factory.hpp"
+#include "algorithms/models/automaton.hpp"
 #include "algorithms/models/syntax_tree.hpp"
 
 #include <string>
-
+#include <memory>
 
 namespace algorithms {
-    class Direct : public AutomataCreator
-    {
-        models::Syntax_tree tree;
-
-        public:
-        Direct(std::string expression);
-        std::unique_ptr<models::Automaton> create_automata (); 
-    };
+    std::unique_ptr<models::Automaton> 
+    regex_to_dfa (std::string expression); 
 }
