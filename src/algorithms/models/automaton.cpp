@@ -103,7 +103,7 @@ std::set<int> Automaton::simulate(std::string word, bool deterministic)
         if (acceptance.contains(s)) 
         return {acceptance.at(s)};
     
-    return {};
+    return {-1};
 }
 
 

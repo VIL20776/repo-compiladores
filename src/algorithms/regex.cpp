@@ -1,6 +1,7 @@
 #include "regex.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <array>
 #include <set>
 #include <map>
@@ -214,11 +215,28 @@ namespace algorithms {
         return std_regex;
     }
 
+    int check_regex (const std::string &regex)
+    {
+        int error = 0;
+        error = 
+            check_char_pairs(regex, {'(',')'}) + 
+            check_char_pairs(regex, {'[',']'});
+        
+        for (char c: "#*+?|")
+            error += (int) regex.starts_with(c);
+        
+        for (char c: "#|")
+            error += (int) regex.ends_with(c);
+        
+        return error;
+    }
+
     std::string to_standard(const std::string &regex)
     {
-        if (check_char_pairs(regex, {'(',')'}) != 0 || 
-            check_char_pairs(regex, {'[',']'}) != 0)
-            return "\0";
+        if (check_regex(regex) > 0) {
+            std::cerr << "La regex " << regex << " es invalida." << std::endl;
+            return "";
+        }
         
         return replace_extentions(regex);
     }

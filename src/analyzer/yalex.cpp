@@ -20,6 +20,17 @@ namespace analyzer {
         ACTION = 436,
     };
 
+    std::map<int,std::string>
+    token_label = {
+        {LET, "LET"},
+        {RULE, "RULE"},
+        {ENTRY_OR, "ENTRY_OR"},
+        {ASSIGN, "ASSIGN"},
+        {IDENT , "IDENT"},
+        {REGEXP, "REGEXP"},
+        {ACTION, "ACTION"}
+    };
+
     std::string Yalex::replace_idents(const std::string &entrypoint)
     {
         std::string entry = entrypoint;
@@ -78,6 +89,7 @@ namespace analyzer {
             buffer.push_back(archivo.get());
         
         archivo.close();
+        buffer.pop_back();
 
         set<int> expected = {LET,RULE,DELIM,O_COMMENT};
 
@@ -88,37 +100,52 @@ namespace analyzer {
 
         int offset = 0;
         int npos = 0;
-        while (buffer.size() > offset) {
+        while (offset < buffer.size() ) {
+            std::string temp_token = "";
             for (size_t i = offset; i < buffer.size(); i++) {
                 char ch = std::abs(buffer.at(i));
-                token.push_back(ch);
-                set<int> result = dfa->simulate(token,true);
+                set<int> result = dfa->simulate(temp_token + ch,true);
                 if (result.empty()) 
+                    break;
+                
+                temp_token.push_back(ch);
+                if (*result.begin() == -1)
                     continue;
 
-                npos = i - offset + 1;
+                token = temp_token;
                 acceptance = *result.begin();
+                npos = i - offset + 1;
             }
-
 
             if (expected.contains(C_COMMENT)) {
                 if (acceptance == C_COMMENT) {
-                    auto it = expected.find(C_COMMENT);
-                    expected.erase(it);
+                    expected.erase(C_COMMENT);
                 }
                 token = "";
                 offset += npos;
                 continue;
             }
-            
+
             if (assign_entry && !expected.contains(IDENT) && acceptance == IDENT) 
                 acceptance = REGEXP;               
- 
+
+            if (!expected.contains(acceptance)) {
+                std::string expected_str;
+                std::cerr 
+                    << "Ha ocurrido un error sintactico.\n"
+                    << "Se recibio: " << token << "\n";
+                expected.erase(O_COMMENT);
+                expected.erase(DELIM);
+                for (int token: expected)
+                    expected_str.append(token_label.at(token) + "\n");
+                
+                std::cerr << "Se esperaba:\n" << expected_str << std::endl;
+                return -1;
+            }
+
             if (!(acceptance == DELIM || acceptance == O_COMMENT))
                 expected.clear();   
 
-            token = buffer.substr(offset,npos);
-            token.shrink_to_fit();
             offset += npos;
 
             switch (acceptance)
@@ -165,6 +192,7 @@ namespace analyzer {
             case DELIM:
                 break;
             case ACTION:
+                expected.insert({ENTRY_OR, DELIM, O_COMMENT});
                 // TODO
                 break;
             default:
